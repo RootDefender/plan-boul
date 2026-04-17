@@ -19,9 +19,16 @@ label{font-size:12px;color:var(--text2);display:block;margin-bottom:4px}
 .spinner{width:36px;height:36px;border:3px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin .8s linear infinite}
 @keyframes spin{to{transform:rotate(360deg)}}
 #loginScreen{position:fixed;inset:0;display:none;align-items:center;justify-content:center;background:var(--bg);z-index:9998;flex-direction:column;gap:32px}
-.login-box{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius2);padding:40px;width:360px;display:flex;flex-direction:column;gap:20px}
+.login-box{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius2);padding:40px;width:380px;display:flex;flex-direction:column;gap:20px}
 .login-subtitle{text-align:center;color:var(--text2);font-size:13px}
 #loginError{color:var(--red);font-size:13px;text-align:center;min-height:18px}
+.login-tabs{display:flex;gap:0;background:var(--bg3);border-radius:var(--radius);padding:3px}
+.login-tab{flex:1;padding:7px;border-radius:6px;background:transparent;color:var(--text2);font-size:13px;font-weight:500;transition:.15s;text-align:center}
+.login-tab.active{background:var(--bg4);color:var(--accent)}
+#pendingScreen{position:fixed;inset:0;display:none;align-items:center;justify-content:center;background:var(--bg);z-index:9997;flex-direction:column;gap:24px;text-align:center;padding:24px}
+.pending-icon{font-size:48px}
+.pending-title{font-size:20px;font-weight:600}
+.pending-sub{color:var(--text2);font-size:14px;max-width:340px;line-height:1.6}
 #app{display:none;height:100vh;flex-direction:column}
 #app.visible{display:flex}
 .topbar{height:52px;background:var(--bg2);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 20px;gap:16px;flex-shrink:0}
@@ -141,12 +148,37 @@ tr:last-child td{border-bottom:none}tr:hover td{background:var(--bg3)}
 <div id="loginScreen">
   <div style="font-family:var(--mono);font-size:28px;font-weight:500;color:var(--accent);letter-spacing:3px">TEAMPLANNER</div>
   <div class="login-box">
-    <div class="login-subtitle">Connexion à votre espace</div>
-    <div class="form-group"><label>Email</label><input type="email" id="loginEmail" placeholder="votre@email.com"></div>
-    <div class="form-group"><label>Mot de passe</label><input type="password" id="loginPass" placeholder="••••••••"></div>
-    <div id="loginError"></div>
-    <button class="btn-primary" id="btnLogin">Se connecter</button>
+    <div class="login-tabs">
+      <button class="login-tab active" id="tabLogin">Connexion</button>
+      <button class="login-tab" id="tabRegister">Inscription</button>
+    </div>
+    <div id="panelLogin">
+      <div style="display:flex;flex-direction:column;gap:16px">
+        <div class="form-group"><label>Email</label><input type="email" id="loginEmail" placeholder="votre@email.com"></div>
+        <div class="form-group"><label>Mot de passe</label><input type="password" id="loginPass" placeholder="••••••••"></div>
+        <div id="loginError"></div>
+        <button class="btn-primary" id="btnLogin">Se connecter</button>
+      </div>
+    </div>
+    <div id="panelRegister" style="display:none">
+      <div style="display:flex;flex-direction:column;gap:16px">
+        <div class="form-group"><label>Prénom Nom</label><input type="text" id="regName" placeholder="Alice Martin"></div>
+        <div class="form-group"><label>Email</label><input type="email" id="regEmail" placeholder="votre@email.com"></div>
+        <div class="form-group"><label>Mot de passe</label><input type="password" id="regPass" placeholder="6 caractères minimum"></div>
+        <div class="form-group"><label>Confirmer</label><input type="password" id="regPass2" placeholder="••••••••"></div>
+        <div id="regError" style="color:var(--red);font-size:13px;text-align:center;min-height:18px"></div>
+        <button class="btn-primary" id="btnRegister">Créer mon compte</button>
+        <div style="font-size:12px;color:var(--text3);text-align:center">Votre compte sera activé par l'administrateur</div>
+      </div>
+    </div>
   </div>
+</div>
+
+<div id="pendingScreen" style="position:fixed;inset:0;display:none;align-items:center;justify-content:center;background:var(--bg);z-index:9997;flex-direction:column;gap:24px;text-align:center;padding:24px">
+  <div style="font-size:48px">⏳</div>
+  <div style="font-size:20px;font-weight:600">Compte en attente de validation</div>
+  <div style="color:var(--text2);font-size:14px;max-width:340px;line-height:1.6">Votre compte a été créé. Un administrateur doit valider votre accès.</div>
+  <button class="btn-secondary" id="btnPendingLogout">Se déconnecter</button>
 </div>
 
 <div id="app">
@@ -280,20 +312,20 @@ import { getFirestore, doc, setDoc, getDoc, collection,
          getDocs, onSnapshot, deleteDoc }
   from "https://www.gstatic.com/firebasejs/11.0.0/firebase-firestore.js";
 import { getAuth, signInWithEmailAndPassword, signOut,
-         onAuthStateChanged, createUserWithEmailAndPassword }
+         onAuthStateChanged, createUserWithEmailAndPassword, updateProfile }
   from "https://www.gstatic.com/firebasejs/11.0.0/firebase-auth.js";
 
 // ════════════════════════════════════════════════════════════════
 //  ▼▼▼  COLLE TON firebaseConfig ICI  ▼▼▼
 // ════════════════════════════════════════════════════════════════
 const firebaseConfig = {
-    apiKey: "AIzaSyCHG2sg5BFbT4c2FiGORTgEXwFEJ-tEmew",
-    authDomain: "plan-boul.firebaseapp.com",
-    projectId: "plan-boul",
-    storageBucket: "plan-boul.firebasestorage.app",
-    messagingSenderId: "505110542086",
-    appId: "1:505110542086:web:652a4be790aa513e6b1087"
-  };
+  apiKey: "AIzaSyCHG2sg5BFbT4c2FiGORTgEXwFEJ-tEmew",
+  authDomain: "plan-boul.firebaseapp.com",
+  projectId: "plan-boul",
+  storageBucket: "plan-boul.firebasestorage.app",
+  messagingSenderId: "505110542086",
+  appId: "1:505110542086:web:652a4be790aa513e6b1087"
+};
 // ════════════════════════════════════════════════════════════════
 //  ▲▲▲  FIN DE LA ZONE À MODIFIER  ▲▲▲
 // ════════════════════════════════════════════════════════════════
@@ -338,20 +370,33 @@ const dRef = (name,id) => doc(db,name,id);
 async function fSet(col,id,data){ syncing(true); await setDoc(dRef(col,id),data); syncing(false); }
 async function fDel(col,id){ syncing(true); await deleteDoc(dRef(col,id)); syncing(false); }
 
+// ── ONGLETS LOGIN / INSCRIPTION ─────────────────────────────────
+$('tabLogin').addEventListener('click',()=>{
+  $('tabLogin').classList.add('active'); $('tabRegister').classList.remove('active');
+  $('panelLogin').style.display=''; $('panelRegister').style.display='none';
+});
+$('tabRegister').addEventListener('click',()=>{
+  $('tabRegister').classList.add('active'); $('tabLogin').classList.remove('active');
+  $('panelRegister').style.display=''; $('panelLogin').style.display='none';
+});
+
 // ── AUTH ─────────────────────────────────────────────────────────
+function showLogin(){ $('loginScreen').style.display='flex'; $('pendingScreen').style.display='none'; $('app').classList.remove('visible'); }
+function showPending(){ $('pendingScreen').style.display='flex'; $('loginScreen').style.display='none'; $('app').classList.remove('visible'); }
+
 onAuthStateChanged(auth, async fbUser => {
   $('loadingScreen').style.display='none';
-  if(!fbUser){
-    $('loginScreen').style.display='flex';
-    $('app').classList.remove('visible');
-    unsubs.forEach(u=>u()); unsubs=[];
-    return;
-  }
+  if(!fbUser){ showLogin(); unsubs.forEach(u=>u()); unsubs=[]; return; }
+
   const snap=await getDoc(dRef('users',fbUser.uid));
   if(!snap.exists()){
-    const p={id:fbUser.uid,name:'Administrateur',email:fbUser.email,role:'admin'};
+    // Tout premier utilisateur = admin automatique
+    const isFirst=(await getDocs(cRef('users'))).empty;
+    const p={id:fbUser.uid,name:fbUser.displayName||fbUser.email,email:fbUser.email,role:isFirst?'admin':'pending'};
     await fSet('users',fbUser.uid,p); me=p;
   } else { me={id:fbUser.uid,...snap.data()}; }
+
+  if(me.role==='pending'){ showPending(); return; }
   startApp();
 });
 
@@ -361,7 +406,30 @@ $('btnLogin').addEventListener('click', async ()=>{
   catch(e){ $('loginError').textContent='Email ou mot de passe incorrect'; }
 });
 $('loginPass').addEventListener('keydown',e=>{ if(e.key==='Enter') $('btnLogin').click(); });
+
+// ── INSCRIPTION ──────────────────────────────────────────────────
+$('btnRegister').addEventListener('click', async ()=>{
+  $('regError').textContent='';
+  const name=val('regName').trim(),email=val('regEmail').trim(),pass=val('regPass'),pass2=val('regPass2');
+  if(!name){$('regError').textContent='Nom requis';return;}
+  if(!email){$('regError').textContent='Email requis';return;}
+  if(pass.length<6){$('regError').textContent='Mot de passe : 6 caractères minimum';return;}
+  if(pass!==pass2){$('regError').textContent='Les mots de passe ne correspondent pas';return;}
+  try{
+    const cred=await createUserWithEmailAndPassword(auth,email,pass);
+    // Le profil sera créé dans onAuthStateChanged avec role='pending'
+    // On stocke le nom via displayName pour le récupérer
+    await updateProfile(cred.user,{displayName:name});
+    // Force re-read du profil
+    const snap=await getDoc(dRef('users',cred.user.uid));
+    if(snap.exists()){ const d=snap.data(); if(d.name!==name) await fSet('users',cred.user.uid,{...d,name}); }
+  } catch(e){
+    $('regError').textContent=e.code==='auth/email-already-in-use'?'Email déjà utilisé':e.message;
+  }
+});
+
 $('btnLogout').addEventListener('click',async()=>{ unsubs.forEach(u=>u()); unsubs=[]; await signOut(auth); });
+$('btnPendingLogout').addEventListener('click',async()=>{ await signOut(auth); });
 
 function startApp(){
   $('loginScreen').style.display='none';
@@ -614,7 +682,9 @@ async function approveReq(rid,approve){
 
 function updateBadge(){
   if(!me) return;
-  const n=S.requests.filter(r=>r.status==='pending').length+S.leaves.filter(l=>l.status==='pending').length;
+  const n=S.requests.filter(r=>r.status==='pending').length
+         +S.leaves.filter(l=>l.status==='pending').length
+         +S.users.filter(u=>u.role==='pending').length;
   const show=n>0&&me.role==='admin';
   $('reqBadgeDot').style.display=show?'':'none';
   $('reqBadgeNav').textContent=show?` (${n})`:'';
@@ -624,7 +694,19 @@ function updateBadge(){
 function renderSettings(){ renderUsersTable(); renderPostsTable(); renderSlotsTable(); }
 
 function renderUsersTable(){
-  $('usersTbody').innerHTML=S.users.map(u=>`<tr><td>${u.name}</td><td style="font-family:var(--mono);font-size:12px">${u.email||''}</td><td><span class="badge ${u.role==='admin'?'badge-blue':'badge-gray'}">${u.role==='admin'?'Admin':'Employé'}</span></td><td style="text-align:right"><button class="btn-icon" data-eu="${u.id}">✏️</button>${u.id!==me.id?`<button class="btn-icon" data-du="${u.id}">🗑</button>`:''}</td></tr>`).join('');
+  const pending=S.users.filter(u=>u.role==='pending');
+  const active=S.users.filter(u=>u.role!=='pending');
+  let rows='';
+  if(pending.length){
+    rows+=`<tr><td colspan="4" style="background:rgba(243,156,18,.1);color:var(--orange);font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.5px">En attente de validation (${pending.length})</td></tr>`;
+    pending.forEach(u=>{
+      rows+=`<tr><td>${u.name}</td><td style="font-family:var(--mono);font-size:12px">${u.email||''}</td><td><span class="badge badge-orange">En attente</span></td><td style="text-align:right"><button class="btn-icon btn-sm" data-approve="${u.id}" title="Valider comme employé">✅</button><button class="btn-icon" data-du="${u.id}" title="Refuser">🗑</button></td></tr>`;
+    });
+  }
+  active.forEach(u=>{
+    rows+=`<tr><td>${u.name}</td><td style="font-family:var(--mono);font-size:12px">${u.email||''}</td><td><span class="badge ${u.role==='admin'?'badge-blue':'badge-gray'}">${u.role==='admin'?'Admin':'Employé'}</span></td><td style="text-align:right"><button class="btn-icon" data-eu="${u.id}">✏️</button>${u.id!==me.id?`<button class="btn-icon" data-du="${u.id}">🗑</button>`:''}</td></tr>`;
+  });
+  $('usersTbody').innerHTML=rows;
 }
 function renderPostsTable(){
   $('postsTbody').innerHTML=S.posts.map(p=>`<tr><td>${p.name}</td><td style="font-family:var(--mono);font-size:12px">${p.rotation}h</td><td><div style="width:20px;height:20px;border-radius:50%;background:${p.color}"></div></td><td style="text-align:right"><button class="btn-icon" data-ep="${p.id}">✏️</button><button class="btn-icon" data-dp="${p.id}">🗑</button></td></tr>`).join('');
@@ -636,11 +718,18 @@ function renderSlotsTable(){
 document.addEventListener('click',e=>{
   const eu=e.target.closest('[data-eu]'); if(eu) openUserModal(eu.dataset.eu);
   const du=e.target.closest('[data-du]'); if(du) delUser(du.dataset.du);
+  const ap=e.target.closest('[data-approve]'); if(ap) approveUser(ap.dataset.approve);
   const ep=e.target.closest('[data-ep]'); if(ep) openPostModal(ep.dataset.ep);
   const dp=e.target.closest('[data-dp]'); if(dp) delPost(dp.dataset.dp);
   const es=e.target.closest('[data-es]'); if(es) openSlotModal(es.dataset.es);
   const ds=e.target.closest('[data-ds]'); if(ds) delSlot(ds.dataset.ds);
 });
+
+async function approveUser(id){
+  const u=S.users.find(x=>x.id===id); if(!u) return;
+  await fSet('users',id,{...u,role:'employee'});
+  toast(`${u.name} validé comme employé`,'success');
+}
 
 // USER
 let eUid=null;
