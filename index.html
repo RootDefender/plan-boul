@@ -5,74 +5,23 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>TeamPlanner</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
-
-<!-- ============================================================
-     FIREBASE CONFIG — REMPLACE ICI
-     Colle ton bloc firebaseConfig récupéré dans la console Firebase
-     (Paramètres du projet > Tes applications > ton app Web)
-     ============================================================ -->
-<script type="module">
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-app.js";
-  import { getFirestore, doc, setDoc, getDoc, collection, getDocs, onSnapshot, deleteDoc, query, where }
-    from "https://www.gstatic.com/firebasejs/11.0.0/firebase-firestore.js";
-  import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged, createUserWithEmailAndPassword }
-    from "https://www.gstatic.com/firebasejs/11.0.0/firebase-auth.js";
-
-  // ▼▼▼ COLLE TON firebaseConfig ICI ▼▼▼
-  const firebaseConfig = {
-    apiKey: "AIzaSyCHG2sg5BFbT4c2FiGORTgEXwFEJ-tEmew",
-    authDomain: "plan-boul.firebaseapp.com",
-    projectId: "plan-boul",
-    storageBucket: "plan-boul.firebasestorage.app",
-    messagingSenderId: "505110542086",
-    appId: "1:505110542086:web:652a4be790aa513e6b1087"
-  };
-  // ▲▲▲ FIN DE LA ZONE DE CONFIGURATION ▲▲▲
-
-  const app  = initializeApp(firebaseConfig);
-  const db   = getFirestore(app);
-  const auth = getAuth(app);
-
-  // ── Expose globally ──────────────────────────────────────────
-  window._fb = { db, auth, doc, setDoc, getDoc, collection, getDocs,
-                 onSnapshot, deleteDoc, query, where,
-                 signInWithEmailAndPassword, signOut,
-                 onAuthStateChanged, createUserWithEmailAndPassword };
-</script>
-
 <style>
-:root {
-  --bg:     #0d0f14; --bg2: #13161e; --bg3: #1a1e29; --bg4: #222638;
-  --border: #2a2f45; --border2: #343a55;
-  --text:   #e2e6f0; --text2: #8b92b0; --text3: #5a6080;
-  --accent: #4f7ef8; --accent2: #3a60d8;
-  --green:  #2ecc71; --green2: #1a7a43;
-  --red:    #e74c3c; --red2:   #7a1a1a;
-  --orange: #f39c12; --orange2:#7a4a0a;
-  --radius: 8px; --radius2: 12px;
-  --mono: 'DM Mono', monospace; --sans: 'DM Sans', sans-serif;
-}
+:root{--bg:#0d0f14;--bg2:#13161e;--bg3:#1a1e29;--bg4:#222638;--border:#2a2f45;--border2:#343a55;--text:#e2e6f0;--text2:#8b92b0;--text3:#5a6080;--accent:#4f7ef8;--accent2:#3a60d8;--green:#2ecc71;--green2:#1a7a43;--red:#e74c3c;--red2:#7a1a1a;--orange:#f39c12;--radius:8px;--radius2:12px;--mono:'DM Mono',monospace;--sans:'DM Sans',sans-serif}
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 html,body{height:100%;font-family:var(--sans);background:var(--bg);color:var(--text);font-size:14px;overflow:hidden}
 button{font-family:var(--sans);cursor:pointer;border:none;outline:none}
 input,select,textarea{font-family:var(--sans);background:var(--bg3);color:var(--text);border:1px solid var(--border);border-radius:var(--radius);padding:8px 12px;font-size:14px;outline:none;width:100%}
 input:focus,select:focus,textarea:focus{border-color:var(--accent)}
-select option{background:var(--bg3)} label{font-size:12px;color:var(--text2);display:block;margin-bottom:4px}
-::-webkit-scrollbar{width:6px;height:6px} ::-webkit-scrollbar-track{background:transparent} ::-webkit-scrollbar-thumb{background:var(--border2);border-radius:3px}
-
-/* LOGIN */
-#loginScreen{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;background:var(--bg);z-index:9999;flex-direction:column;gap:32px}
-.login-box{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius2);padding:40px;width:360px;display:flex;flex-direction:column;gap:20px}
-.login-logo{font-family:var(--mono);font-size:22px;font-weight:500;color:var(--accent);letter-spacing:2px;text-align:center}
-.login-subtitle{text-align:center;color:var(--text2);font-size:13px;margin-top:-12px}
-#loginError{color:var(--red);font-size:13px;text-align:center;min-height:18px}
-
-/* SPINNER */
-#loadingScreen{position:fixed;inset:0;background:var(--bg);z-index:9998;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:16px}
+select option{background:var(--bg3)}
+label{font-size:12px;color:var(--text2);display:block;margin-bottom:4px}
+::-webkit-scrollbar{width:6px;height:6px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:var(--border2);border-radius:3px}
+#loadingScreen{position:fixed;inset:0;background:var(--bg);z-index:9999;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:16px}
 .spinner{width:36px;height:36px;border:3px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin .8s linear infinite}
 @keyframes spin{to{transform:rotate(360deg)}}
-
-/* APP */
+#loginScreen{position:fixed;inset:0;display:none;align-items:center;justify-content:center;background:var(--bg);z-index:9998;flex-direction:column;gap:32px}
+.login-box{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius2);padding:40px;width:360px;display:flex;flex-direction:column;gap:20px}
+.login-subtitle{text-align:center;color:var(--text2);font-size:13px}
+#loginError{color:var(--red);font-size:13px;text-align:center;min-height:18px}
 #app{display:none;height:100vh;flex-direction:column}
 #app.visible{display:flex}
 .topbar{height:52px;background:var(--bg2);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 20px;gap:16px;flex-shrink:0}
@@ -80,7 +29,7 @@ select option{background:var(--bg3)} label{font-size:12px;color:var(--text2);dis
 .topbar-sep{width:1px;height:24px;background:var(--border);margin:0 4px}
 .topbar-nav{display:flex;gap:4px;flex:1}
 .nav-btn{padding:6px 14px;border-radius:var(--radius);background:transparent;color:var(--text2);font-size:13px;font-weight:500;transition:.15s}
-.nav-btn:hover{background:var(--bg3);color:var(--text)} .nav-btn.active{background:var(--bg4);color:var(--accent)}
+.nav-btn:hover{background:var(--bg3);color:var(--text)}.nav-btn.active{background:var(--bg4);color:var(--accent)}
 .topbar-right{display:flex;align-items:center;gap:12px;margin-left:auto}
 .user-chip{display:flex;align-items:center;gap:8px;padding:4px 10px;background:var(--bg3);border-radius:20px;font-size:13px;color:var(--text2)}
 .avatar{width:24px;height:24px;border-radius:50%;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;color:#fff}
@@ -90,50 +39,30 @@ select option{background:var(--bg3)} label{font-size:12px;color:var(--text2);dis
 .btn-logout{padding:6px 12px;background:transparent;color:var(--text3);border-radius:var(--radius);font-size:13px;transition:.15s}
 .btn-logout:hover{background:var(--bg3);color:var(--red)}
 .sync-indicator{font-size:11px;color:var(--text3);font-family:var(--mono);display:flex;align-items:center;gap:5px}
-.sync-dot{width:6px;height:6px;border-radius:50%;background:var(--green)}
-.sync-dot.syncing{background:var(--orange);animation:pulse 1s infinite}
+.sync-dot{width:6px;height:6px;border-radius:50%;background:var(--green)}.sync-dot.syncing{background:var(--orange);animation:pulse 1s infinite}
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
-
-/* MAIN */
 .main{flex:1;overflow:hidden;display:flex;flex-direction:column}
 .page{display:none;flex:1;overflow:auto;padding:24px}
 .page.active{display:flex;flex-direction:column;gap:20px}
-
-/* BUTTONS */
-.btn-primary{padding:9px 18px;background:var(--accent);color:#fff;border-radius:var(--radius);font-size:13px;font-weight:500;transition:.15s}
-.btn-primary:hover{background:var(--accent2)}
-.btn-secondary{padding:9px 18px;background:var(--bg3);color:var(--text);border:1px solid var(--border);border-radius:var(--radius);font-size:13px;font-weight:500;transition:.15s}
-.btn-secondary:hover{background:var(--bg4);border-color:var(--border2)}
-.btn-danger{padding:9px 18px;background:transparent;color:var(--red);border:1px solid var(--red2);border-radius:var(--radius);font-size:13px;font-weight:500;transition:.15s}
-.btn-danger:hover{background:var(--red2)}
-.btn-success{padding:9px 18px;background:transparent;color:var(--green);border:1px solid var(--green2);border-radius:var(--radius);font-size:13px;font-weight:500;transition:.15s}
-.btn-success:hover{background:var(--green2)}
-.btn-sm{padding:5px 10px;font-size:12px} .btn-icon{padding:6px;background:transparent;color:var(--text2);border-radius:var(--radius);font-size:16px;line-height:1;transition:.15s}
-.btn-icon:hover{background:var(--bg4);color:var(--text)}
-
-/* PAGE HEADER */
+.btn-primary{padding:9px 18px;background:var(--accent);color:#fff;border-radius:var(--radius);font-size:13px;font-weight:500;transition:.15s}.btn-primary:hover{background:var(--accent2)}
+.btn-secondary{padding:9px 18px;background:var(--bg3);color:var(--text);border:1px solid var(--border);border-radius:var(--radius);font-size:13px;font-weight:500;transition:.15s}.btn-secondary:hover{background:var(--bg4);border-color:var(--border2)}
+.btn-danger{padding:9px 18px;background:transparent;color:var(--red);border:1px solid var(--red2);border-radius:var(--radius);font-size:13px;font-weight:500;transition:.15s}.btn-danger:hover{background:var(--red2)}
+.btn-success{padding:9px 18px;background:transparent;color:var(--green);border:1px solid var(--green2);border-radius:var(--radius);font-size:13px;font-weight:500;transition:.15s}.btn-success:hover{background:var(--green2)}
+.btn-sm{padding:5px 10px;font-size:12px}.btn-icon{padding:6px;background:transparent;color:var(--text2);border-radius:var(--radius);font-size:16px;line-height:1;transition:.15s}.btn-icon:hover{background:var(--bg4);color:var(--text)}
 .page-header{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
-.page-title{font-size:20px;font-weight:600} .page-sub{color:var(--text2);font-size:13px;margin-top:2px}
+.page-title{font-size:20px;font-weight:600}.page-sub{color:var(--text2);font-size:13px;margin-top:2px}
 .page-header .actions{margin-left:auto;display:flex;gap:8px}
-
-/* CARD */
 .card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius2);padding:20px}
-.card-title{font-size:14px;font-weight:600;margin-bottom:16px;display:flex;align-items:center;gap:8px}
-
-/* TABLE */
+.card-title{font-size:14px;font-weight:600;margin-bottom:16px}
 .table-wrap{overflow:auto;border-radius:var(--radius)}
 table{width:100%;border-collapse:collapse}
 th{font-size:11px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.8px;padding:10px 12px;background:var(--bg3);text-align:left;border-bottom:1px solid var(--border)}
 td{padding:10px 12px;border-bottom:1px solid var(--border);font-size:13px;vertical-align:middle}
-tr:last-child td{border-bottom:none} tr:hover td{background:var(--bg3)}
-
-/* BADGE */
+tr:last-child td{border-bottom:none}tr:hover td{background:var(--bg3)}
 .badge{display:inline-flex;align-items:center;padding:2px 8px;border-radius:20px;font-size:11px;font-weight:600;letter-spacing:.3px}
-.badge-blue{background:rgba(79,126,248,.18);color:#7fa8ff} .badge-green{background:rgba(46,204,113,.18);color:#5ee89a}
-.badge-red{background:rgba(231,76,60,.18);color:#ff7b6e} .badge-orange{background:rgba(243,156,18,.18);color:#ffc84a}
+.badge-blue{background:rgba(79,126,248,.18);color:#7fa8ff}.badge-green{background:rgba(46,204,113,.18);color:#5ee89a}
+.badge-red{background:rgba(231,76,60,.18);color:#ff7b6e}.badge-orange{background:rgba(243,156,18,.18);color:#ffc84a}
 .badge-gray{background:rgba(90,96,128,.25);color:var(--text2)}
-
-/* CALENDAR */
 .cal-toolbar{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
 .view-toggle{display:flex;gap:4px;background:var(--bg3);border-radius:var(--radius);padding:3px}
 .view-toggle button{padding:5px 14px;border-radius:6px;background:transparent;color:var(--text2);font-size:13px;font-weight:500;transition:.15s}
@@ -142,1049 +71,631 @@ tr:last-child td{border-bottom:none} tr:hover td{background:var(--bg3)}
 .cal-nav button{padding:5px 10px;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius);color:var(--text2);font-size:16px;transition:.15s}
 .cal-nav button:hover{background:var(--bg4);color:var(--text)}
 .cal-label{font-size:15px;font-weight:600;min-width:200px;text-align:center}
-
-/* WEEK */
 .week-grid{display:grid;grid-template-columns:80px repeat(7,1fr);border:1px solid var(--border);border-radius:var(--radius2);overflow:hidden;background:var(--bg2)}
 .wh-corner{background:var(--bg3);border-right:1px solid var(--border);border-bottom:1px solid var(--border);padding:10px 8px}
 .wh-day{background:var(--bg3);border-right:1px solid var(--border);border-bottom:1px solid var(--border);padding:10px 8px;text-align:center;font-size:12px}
-.wh-day .day-name{font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:.5px;font-size:10px}
-.wh-day .day-num{font-size:18px;font-weight:600;line-height:1.2}
-.wh-day.today{background:rgba(79,126,248,.08)} .wh-day.today .day-num{color:var(--accent)}
-.ws-label{background:var(--bg3);border-right:1px solid var(--border);border-bottom:1px solid var(--border);padding:6px 8px;font-size:11px;color:var(--text3);font-family:var(--mono);display:flex;align-items:flex-start;padding-top:8px}
+.wh-day .dn{font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:.5px;font-size:10px}
+.wh-day .dd{font-size:18px;font-weight:600;line-height:1.2}
+.wh-day.today{background:rgba(79,126,248,.08)}.wh-day.today .dd{color:var(--accent)}
+.ws-label{background:var(--bg3);border-right:1px solid var(--border);border-bottom:1px solid var(--border);padding:8px;font-size:11px;color:var(--text3);font-family:var(--mono)}
 .ws-cell{border-right:1px solid var(--border);border-bottom:1px solid var(--border);padding:4px;min-height:60px;display:flex;flex-direction:column;gap:3px;background:var(--bg2)}
-.ws-cell:last-child{border-right:none} .ws-cell.today-col{background:rgba(79,126,248,.04)}
-
-/* MONTH */
+.ws-cell:last-child{border-right:none}.ws-cell.today-col{background:rgba(79,126,248,.04)}
 .month-grid{display:grid;grid-template-columns:repeat(7,1fr);border:1px solid var(--border);border-radius:var(--radius2);overflow:hidden;background:var(--bg2)}
-.month-day-header{background:var(--bg3);padding:8px;text-align:center;font-size:10px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.5px;border-bottom:1px solid var(--border)}
+.month-day-hdr{background:var(--bg3);padding:8px;text-align:center;font-size:10px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.5px;border-bottom:1px solid var(--border)}
 .month-cell{border-right:1px solid var(--border);border-bottom:1px solid var(--border);padding:6px;min-height:90px;background:var(--bg2);transition:.1s}
-.month-cell:nth-child(7n){border-right:none} .month-cell:hover{background:var(--bg3)}
-.month-cell.other-month{opacity:.35} .month-cell.today-cell{background:rgba(79,126,248,.06)}
-.month-cell .mc-num{font-size:12px;font-weight:600;margin-bottom:4px;color:var(--text2)}
+.month-cell:nth-child(7n){border-right:none}.month-cell:hover{background:var(--bg3)}
+.month-cell.other-month{opacity:.35}.month-cell.today-cell{background:rgba(79,126,248,.06)}
+.mc-num{font-size:12px;font-weight:600;margin-bottom:4px;color:var(--text2)}
 .month-cell.today-cell .mc-num{color:var(--accent)}
-
-/* CHIPS */
 .assign-chip{padding:2px 6px;border-radius:4px;font-size:11px;font-weight:500;cursor:pointer;transition:.1s;display:flex;align-items:center;gap:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.assign-chip:hover{filter:brightness(1.2)}
-.assign-chip.conflict{outline:2px solid var(--red);background:var(--red2)!important;color:#fff!important}
+.assign-chip:hover{filter:brightness(1.2)}.assign-chip.conflict{outline:2px solid var(--red);background:var(--red2)!important;color:#fff!important}
 .leave-chip{padding:2px 6px;border-radius:4px;font-size:11px;background:rgba(26,122,67,.35);color:#5ee89a;font-weight:500;cursor:pointer}
-.leave-chip.pending{background:rgba(122,74,10,.35);color:#ffc84a}
-.leave-chip.refused{background:rgba(122,26,26,.35);color:#ff7b6e;text-decoration:line-through}
-
-/* MODAL */
+.leave-chip.pending{background:rgba(122,74,10,.35);color:#ffc84a}.leave-chip.refused{background:rgba(122,26,26,.35);color:#ff7b6e;text-decoration:line-through}
 .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:1000;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:.2s}
 .modal-overlay.open{opacity:1;pointer-events:all}
 .modal{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius2);width:480px;max-width:95vw;max-height:90vh;display:flex;flex-direction:column;transform:translateY(16px);transition:.2s}
-.modal-overlay.open .modal{transform:translateY(0)} .modal.wide{width:640px}
+.modal-overlay.open .modal{transform:translateY(0)}.modal.wide{width:640px}
 .modal-header{padding:20px 24px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
 .modal-title{font-size:16px;font-weight:600}
-.modal-close{background:transparent;color:var(--text3);font-size:20px;padding:4px;border-radius:var(--radius);transition:.15s}
-.modal-close:hover{background:var(--bg3);color:var(--text)}
+.modal-close{background:transparent;color:var(--text3);font-size:20px;padding:4px;border-radius:var(--radius);transition:.15s}.modal-close:hover{background:var(--bg3);color:var(--text)}
 .modal-body{padding:20px 24px;overflow-y:auto;display:flex;flex-direction:column;gap:16px}
 .modal-footer{padding:16px 24px;border-top:1px solid var(--border);display:flex;justify-content:flex-end;gap:8px}
-
-/* FORM */
 .form-row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
 .form-group{display:flex;flex-direction:column;gap:6px}
-
-/* SETTINGS */
 .settings-layout{display:grid;grid-template-columns:1fr 1fr;gap:20px}
 @media(max-width:800px){.settings-layout{grid-template-columns:1fr}}
-
-/* REQUESTS */
 .req-list{display:flex;flex-direction:column;gap:10px}
 .req-card{background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius);padding:14px 16px;display:flex;align-items:flex-start;gap:12px}
-.req-icon{font-size:20px;flex-shrink:0;margin-top:2px} .req-info{flex:1}
-.req-title{font-weight:600;font-size:13px} .req-meta{color:var(--text2);font-size:12px;margin-top:3px}
-.req-actions{display:flex;gap:6px;flex-shrink:0}
-
-/* CONFLICT */
+.req-icon{font-size:20px;flex-shrink:0;margin-top:2px}.req-info{flex:1}
+.req-title{font-weight:600;font-size:13px}.req-meta{color:var(--text2);font-size:12px;margin-top:3px}
+.req-actions{display:flex;gap:6px;flex-shrink:0;align-items:flex-start}
 .conflict-banner{background:var(--red2);border:1px solid var(--red);border-radius:var(--radius);padding:10px 14px;font-size:13px;color:#ff9e97;display:flex;align-items:center;gap:8px}
-
-/* TOAST */
 #toast{position:fixed;bottom:24px;right:24px;z-index:9998;display:flex;flex-direction:column;gap:8px;pointer-events:none}
-.toast-item{background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius);padding:12px 16px;font-size:13px;min-width:240px;animation:slideIn .25s ease;display:flex;align-items:center;gap:10px}
-.toast-item.success{border-color:var(--green2);color:var(--green)} .toast-item.error{border-color:var(--red2);color:var(--red)}
+.toast-item{background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius);padding:12px 16px;font-size:13px;min-width:240px;animation:slideIn .25s ease}
+.toast-item.success{border-color:var(--green2);color:var(--green)}.toast-item.error{border-color:var(--red2);color:var(--red)}
 @keyframes slideIn{from{transform:translateX(20px);opacity:0}to{transform:translateX(0);opacity:1}}
-
-/* EMPTY */
 .empty-state{text-align:center;padding:48px 24px;color:var(--text3)}
 .empty-state .icon{font-size:40px;margin-bottom:12px}
-
-/* COLOR SWATCHES */
 .color-row{display:flex;gap:8px;flex-wrap:wrap}
 .color-swatch{width:28px;height:28px;border-radius:50%;cursor:pointer;border:3px solid transparent;transition:.15s}
 .color-swatch.selected{border-color:#fff}
 .divider{height:1px;background:var(--border);margin:4px 0}
+@media print{
+  body{background:white!important;color:black!important;font-size:11px}
+  #loadingScreen,#loginScreen,.topbar,.cal-toolbar,.page-header .actions,#conflictBanner{display:none!important}
+  .page{display:block!important;padding:0!important}
+  .week-grid,.month-grid{border:1px solid #ccc!important}
+  .wh-day,.ws-label,.ws-cell,.wh-corner,.month-cell,.month-day-hdr{background:white!important;color:black!important;border-color:#ccc!important}
+  .assign-chip{background:#eee!important;color:black!important;border:1px solid #ccc!important}
+  .assign-chip.conflict{border:2px solid red!important}
+}
 </style>
 </head>
 <body>
 
-<!-- LOADING -->
 <div id="loadingScreen">
   <div class="spinner"></div>
   <div style="color:var(--text3);font-family:var(--mono);font-size:13px">Connexion à Firebase…</div>
 </div>
 
-<!-- LOGIN -->
-<div id="loginScreen" style="display:none">
+<div id="loginScreen">
   <div style="font-family:var(--mono);font-size:28px;font-weight:500;color:var(--accent);letter-spacing:3px">TEAMPLANNER</div>
   <div class="login-box">
     <div class="login-subtitle">Connexion à votre espace</div>
-    <div class="form-group">
-      <label>Email</label>
-      <input type="email" id="loginEmail" placeholder="votre@email.com" autocomplete="username">
-    </div>
-    <div class="form-group">
-      <label>Mot de passe</label>
-      <input type="password" id="loginPass" placeholder="••••••••" autocomplete="current-password">
-    </div>
+    <div class="form-group"><label>Email</label><input type="email" id="loginEmail" placeholder="votre@email.com"></div>
+    <div class="form-group"><label>Mot de passe</label><input type="password" id="loginPass" placeholder="••••••••"></div>
     <div id="loginError"></div>
-    <button class="btn-primary" onclick="doLogin()">Se connecter</button>
+    <button class="btn-primary" id="btnLogin">Se connecter</button>
   </div>
 </div>
 
-<!-- APP -->
 <div id="app">
   <div class="topbar">
     <span class="topbar-logo">TEAMPLANNER</span>
     <div class="topbar-sep"></div>
     <div class="topbar-nav">
-      <button class="nav-btn active" data-page="planning" onclick="showPage('planning')">📅 Planning</button>
-      <button class="nav-btn" data-page="requests" onclick="showPage('requests')">🔄 Demandes <span id="reqBadgeNav"></span></button>
-      <button class="nav-btn admin-only" data-page="settings" onclick="showPage('settings')">⚙️ Paramètres</button>
+      <button class="nav-btn active" data-page="planning" id="navPlanning">📅 Planning</button>
+      <button class="nav-btn" data-page="requests" id="navRequests">🔄 Demandes <span id="reqBadgeNav"></span></button>
+      <button class="nav-btn admin-only" data-page="settings" id="navSettings">⚙️ Paramètres</button>
     </div>
     <div class="topbar-right">
       <div class="sync-indicator"><div class="sync-dot" id="syncDot"></div><span id="syncLabel">Synchronisé</span></div>
-      <button class="badge-btn" onclick="showPage('requests')" title="Demandes en attente">
-        🔔<span class="badge-dot" id="reqBadgeDot" style="display:none"></span>
-      </button>
-      <div class="user-chip">
-        <div class="avatar" id="topAvatar">?</div>
-        <span id="topUsername">—</span>
-        <span id="topRole" class="badge badge-blue" style="font-size:10px"></span>
-      </div>
-      <button class="btn-logout" onclick="doLogout()">Déconnexion</button>
+      <button class="badge-btn" id="btnBell">🔔<span class="badge-dot" id="reqBadgeDot" style="display:none"></span></button>
+      <div class="user-chip"><div class="avatar" id="topAvatar">?</div><span id="topUsername">—</span><span id="topRole" class="badge badge-blue" style="font-size:10px"></span></div>
+      <button class="btn-logout" id="btnLogout">Déconnexion</button>
     </div>
   </div>
-
   <div class="main">
-
-    <!-- PLANNING -->
     <div id="page-planning" class="page active">
       <div class="page-header">
-        <div>
-          <div class="page-title">Planning</div>
-          <div class="page-sub" id="planningSubtitle"></div>
-        </div>
+        <div><div class="page-title">Planning</div></div>
         <div class="cal-toolbar" style="margin-left:auto;gap:10px">
-          <div class="view-toggle">
-            <button id="btnWeek" class="active" onclick="setView('week')">Semaine</button>
-            <button id="btnMonth" onclick="setView('month')">Mois</button>
-          </div>
-          <div class="cal-nav">
-            <button onclick="navCal(-1)">‹</button>
-            <div class="cal-label" id="calLabel"></div>
-            <button onclick="navCal(1)">›</button>
-          </div>
-          <button class="btn-secondary btn-sm" onclick="navToday()">Aujourd'hui</button>
-          <span class="admin-only">
-            <button class="btn-primary btn-sm" onclick="openAssignModal()">+ Affecter</button>
-          </span>
-          <button class="btn-secondary btn-sm" onclick="exportPDF()">📄 PDF</button>
-          <button class="btn-secondary btn-sm" onclick="exportJSON()">⬇ JSON</button>
+          <div class="view-toggle"><button id="btnWeek" class="active">Semaine</button><button id="btnMonth">Mois</button></div>
+          <div class="cal-nav"><button id="btnPrev">‹</button><div class="cal-label" id="calLabel"></div><button id="btnNext">›</button></div>
+          <button class="btn-secondary btn-sm" id="btnToday">Aujourd'hui</button>
+          <span class="admin-only"><button class="btn-primary btn-sm" id="btnAssign">+ Affecter</button></span>
+          <button class="btn-secondary btn-sm" id="btnPDF">📄 PDF</button>
+          <button class="btn-secondary btn-sm" id="btnExport">⬇ JSON</button>
         </div>
       </div>
       <div id="conflictBanner" class="conflict-banner" style="display:none">⚠️ <span id="conflictMsg"></span></div>
       <div id="calendarContainer"></div>
     </div>
-
-    <!-- DEMANDES -->
     <div id="page-requests" class="page">
       <div class="page-header">
-        <div>
-          <div class="page-title">Demandes</div>
-          <div class="page-sub">Changements de poste et congés</div>
-        </div>
+        <div><div class="page-title">Demandes</div><div class="page-sub">Changements de poste et congés</div></div>
         <div class="actions">
-          <button class="btn-primary" onclick="openLeaveModal()">+ Déclarer un congé</button>
-          <button class="btn-secondary" onclick="openChangeRequestModal()">🔄 Demander un changement</button>
+          <button class="btn-primary" id="btnLeave">+ Déclarer un congé</button>
+          <button class="btn-secondary" id="btnChange">🔄 Demander un changement</button>
         </div>
       </div>
       <div id="requestsList" class="req-list"></div>
     </div>
-
-    <!-- PARAMÈTRES -->
     <div id="page-settings" class="page admin-only">
       <div class="page-header"><div class="page-title">Paramètres</div></div>
       <div class="settings-layout">
-
-        <div class="card">
-          <div class="card-title">👥 Utilisateurs</div>
-          <button class="btn-primary btn-sm" onclick="openUserModal()" style="margin-bottom:12px">+ Ajouter</button>
-          <div class="table-wrap">
-            <table><thead><tr><th>Nom</th><th>Email</th><th>Rôle</th><th></th></tr></thead>
-            <tbody id="usersTbody"></tbody></table>
-          </div>
-        </div>
-
-        <div class="card">
-          <div class="card-title">🏷️ Postes</div>
-          <button class="btn-primary btn-sm" onclick="openPostModal()" style="margin-bottom:12px">+ Ajouter</button>
-          <div class="table-wrap">
-            <table><thead><tr><th>Poste</th><th>Rotation</th><th>Couleur</th><th></th></tr></thead>
-            <tbody id="postsTbody"></tbody></table>
-          </div>
-        </div>
-
-        <div class="card">
-          <div class="card-title">🕐 Créneaux horaires</div>
-          <button class="btn-primary btn-sm" onclick="openSlotModal()" style="margin-bottom:12px">+ Ajouter</button>
-          <div class="table-wrap">
-            <table><thead><tr><th>Nom</th><th>Début</th><th>Fin</th><th></th></tr></thead>
-            <tbody id="slotsTbody"></tbody></table>
-          </div>
-        </div>
-
-        <div class="card">
-          <div class="card-title">💾 Données</div>
-          <div style="display:flex;flex-direction:column;gap:10px">
-            <button class="btn-secondary" onclick="exportJSON()">⬇ Exporter JSON</button>
-            <div class="divider"></div>
-            <button class="btn-danger" onclick="resetAll()">🗑 Réinitialiser toutes les données</button>
-          </div>
-        </div>
-
+        <div class="card"><div class="card-title">👥 Utilisateurs</div><button class="btn-primary btn-sm" id="btnAddUser" style="margin-bottom:12px">+ Ajouter</button><div class="table-wrap"><table><thead><tr><th>Nom</th><th>Email</th><th>Rôle</th><th></th></tr></thead><tbody id="usersTbody"></tbody></table></div></div>
+        <div class="card"><div class="card-title">🏷️ Postes</div><button class="btn-primary btn-sm" id="btnAddPost" style="margin-bottom:12px">+ Ajouter</button><div class="table-wrap"><table><thead><tr><th>Poste</th><th>Rotation</th><th>Couleur</th><th></th></tr></thead><tbody id="postsTbody"></tbody></table></div></div>
+        <div class="card"><div class="card-title">🕐 Créneaux</div><button class="btn-primary btn-sm" id="btnAddSlot" style="margin-bottom:12px">+ Ajouter</button><div class="table-wrap"><table><thead><tr><th>Nom</th><th>Début</th><th>Fin</th><th></th></tr></thead><tbody id="slotsTbody"></tbody></table></div></div>
+        <div class="card"><div class="card-title">💾 Données</div><div style="display:flex;flex-direction:column;gap:10px"><button class="btn-secondary" id="btnExport2">⬇ Exporter JSON</button><div class="divider"></div><button class="btn-danger" id="btnReset">🗑 Réinitialiser</button></div></div>
       </div>
     </div>
-
   </div>
 </div>
 
 <!-- MODALS -->
-
-<!-- Affecter -->
-<div class="modal-overlay" id="modalAssign">
-  <div class="modal">
-    <div class="modal-header"><div class="modal-title">Affecter un poste</div><button class="modal-close" onclick="closeModal('modalAssign')">✕</button></div>
-    <div class="modal-body">
-      <div class="form-row">
-        <div class="form-group"><label>Employé</label><select id="aUser"></select></div>
-        <div class="form-group"><label>Poste</label><select id="aPost"></select></div>
-      </div>
-      <div class="form-row">
-        <div class="form-group"><label>Date</label><input type="date" id="aDate"></div>
-        <div class="form-group"><label>Créneau</label><select id="aSlot"></select></div>
-      </div>
-      <div id="aConflictWarn" class="conflict-banner" style="display:none">⚠️ Ce créneau est déjà occupé — doublon signalé.</div>
-    </div>
-    <div class="modal-footer">
-      <button class="btn-secondary" onclick="closeModal('modalAssign')">Annuler</button>
-      <button class="btn-primary" onclick="saveAssignment()">Affecter</button>
-    </div>
+<div class="modal-overlay" id="modalAssign"><div class="modal">
+  <div class="modal-header"><div class="modal-title">Affecter un poste</div><button class="modal-close" data-close="modalAssign">✕</button></div>
+  <div class="modal-body">
+    <div class="form-row"><div class="form-group"><label>Employé</label><select id="aUser"></select></div><div class="form-group"><label>Poste</label><select id="aPost"></select></div></div>
+    <div class="form-row"><div class="form-group"><label>Date</label><input type="date" id="aDate"></div><div class="form-group"><label>Créneau</label><select id="aSlot"></select></div></div>
+    <div id="aConflictWarn" class="conflict-banner" style="display:none">⚠️ Ce créneau est déjà occupé.</div>
   </div>
-</div>
+  <div class="modal-footer"><button class="btn-secondary" data-close="modalAssign">Annuler</button><button class="btn-primary" id="btnSaveAssign">Affecter</button></div>
+</div></div>
 
-<!-- Détail chip -->
-<div class="modal-overlay" id="modalChip">
-  <div class="modal">
-    <div class="modal-header"><div class="modal-title" id="chipTitle">Détail</div><button class="modal-close" onclick="closeModal('modalChip')">✕</button></div>
-    <div class="modal-body" id="chipBody"></div>
-    <div class="modal-footer" id="chipFooter"></div>
-  </div>
-</div>
+<div class="modal-overlay" id="modalChip"><div class="modal">
+  <div class="modal-header"><div class="modal-title" id="chipTitle">Détail</div><button class="modal-close" data-close="modalChip">✕</button></div>
+  <div class="modal-body" id="chipBody"></div>
+  <div class="modal-footer" id="chipFooter"></div>
+</div></div>
 
-<!-- Congé -->
-<div class="modal-overlay" id="modalLeave">
-  <div class="modal">
-    <div class="modal-header"><div class="modal-title">Déclarer un congé</div><button class="modal-close" onclick="closeModal('modalLeave')">✕</button></div>
-    <div class="modal-body">
-      <div class="form-group" id="leaveUserGroup">
-        <label>Employé</label><select id="lUser"></select>
-      </div>
-      <div class="form-row">
-        <div class="form-group"><label>Date début</label><input type="date" id="lStart"></div>
-        <div class="form-group"><label>Date fin</label><input type="date" id="lEnd"></div>
-      </div>
-      <div class="form-group">
-        <label>Type</label>
-        <select id="lType">
-          <option value="CP">Congés payés (CP)</option><option value="RTT">RTT</option>
-          <option value="Maladie">Arrêt maladie</option><option value="Récup">Récupération</option>
-          <option value="Formation">Formation</option><option value="Autre">Autre</option>
-        </select>
-      </div>
-      <div class="form-group"><label>Note (optionnel)</label><textarea id="lNote" rows="2"></textarea></div>
-    </div>
-    <div class="modal-footer">
-      <button class="btn-secondary" onclick="closeModal('modalLeave')">Annuler</button>
-      <button class="btn-primary" onclick="saveLeave()">Déclarer</button>
-    </div>
+<div class="modal-overlay" id="modalLeave"><div class="modal">
+  <div class="modal-header"><div class="modal-title">Déclarer un congé</div><button class="modal-close" data-close="modalLeave">✕</button></div>
+  <div class="modal-body">
+    <div class="form-group" id="leaveUserGroup"><label>Employé</label><select id="lUser"></select></div>
+    <div class="form-row"><div class="form-group"><label>Début</label><input type="date" id="lStart"></div><div class="form-group"><label>Fin</label><input type="date" id="lEnd"></div></div>
+    <div class="form-group"><label>Type</label><select id="lType"><option value="CP">Congés payés (CP)</option><option value="RTT">RTT</option><option value="Maladie">Arrêt maladie</option><option value="Récup">Récupération</option><option value="Formation">Formation</option><option value="Autre">Autre</option></select></div>
+    <div class="form-group"><label>Note</label><textarea id="lNote" rows="2"></textarea></div>
   </div>
-</div>
+  <div class="modal-footer"><button class="btn-secondary" data-close="modalLeave">Annuler</button><button class="btn-primary" id="btnSaveLeave">Déclarer</button></div>
+</div></div>
 
-<!-- Changement -->
-<div class="modal-overlay" id="modalChangeReq">
-  <div class="modal wide">
-    <div class="modal-header"><div class="modal-title">Demander un changement de poste</div><button class="modal-close" onclick="closeModal('modalChangeReq')">✕</button></div>
-    <div class="modal-body">
-      <div class="form-group"><label>Mon créneau actuel à libérer</label><select id="crFrom"></select></div>
-      <div class="form-group"><label>Créneau cible (libre ou occupé)</label><select id="crTo"></select></div>
-      <div class="form-group"><label>Motif</label><textarea id="crNote" rows="2"></textarea></div>
-    </div>
-    <div class="modal-footer">
-      <button class="btn-secondary" onclick="closeModal('modalChangeReq')">Annuler</button>
-      <button class="btn-primary" onclick="saveChangeRequest()">Envoyer la demande</button>
-    </div>
+<div class="modal-overlay" id="modalChangeReq"><div class="modal wide">
+  <div class="modal-header"><div class="modal-title">Demande de changement</div><button class="modal-close" data-close="modalChangeReq">✕</button></div>
+  <div class="modal-body">
+    <div class="form-group"><label>Mon créneau à libérer</label><select id="crFrom"></select></div>
+    <div class="form-group"><label>Créneau cible</label><select id="crTo"></select></div>
+    <div class="form-group"><label>Motif</label><textarea id="crNote" rows="2"></textarea></div>
   </div>
-</div>
+  <div class="modal-footer"><button class="btn-secondary" data-close="modalChangeReq">Annuler</button><button class="btn-primary" id="btnSaveChange">Envoyer</button></div>
+</div></div>
 
-<!-- Utilisateur -->
-<div class="modal-overlay" id="modalUser">
-  <div class="modal">
-    <div class="modal-header"><div class="modal-title" id="userModalTitle">Ajouter un utilisateur</div><button class="modal-close" onclick="closeModal('modalUser')">✕</button></div>
-    <div class="modal-body">
-      <div class="form-row">
-        <div class="form-group"><label>Nom affiché</label><input type="text" id="uName" placeholder="Alice Martin"></div>
-        <div class="form-group"><label>Email (= login)</label><input type="email" id="uEmail" placeholder="alice@exemple.com"></div>
-      </div>
-      <div class="form-row">
-        <div class="form-group"><label>Mot de passe <span id="uPassHint" style="color:var(--text3)"></span></label><input type="password" id="uPass" placeholder="••••••••"></div>
-        <div class="form-group"><label>Rôle</label><select id="uRole"><option value="employee">Employé</option><option value="admin">Admin</option></select></div>
-      </div>
-    </div>
-    <div class="modal-footer">
-      <button class="btn-secondary" onclick="closeModal('modalUser')">Annuler</button>
-      <button class="btn-primary" onclick="saveUser()">Enregistrer</button>
-    </div>
+<div class="modal-overlay" id="modalUser"><div class="modal">
+  <div class="modal-header"><div class="modal-title" id="userModalTitle">Ajouter</div><button class="modal-close" data-close="modalUser">✕</button></div>
+  <div class="modal-body">
+    <div class="form-row"><div class="form-group"><label>Nom</label><input type="text" id="uName"></div><div class="form-group"><label>Email</label><input type="email" id="uEmail"></div></div>
+    <div class="form-row"><div class="form-group"><label>Mot de passe <span id="uPassHint" style="color:var(--text3)"></span></label><input type="password" id="uPass"></div><div class="form-group"><label>Rôle</label><select id="uRole"><option value="employee">Employé</option><option value="admin">Admin</option></select></div></div>
   </div>
-</div>
+  <div class="modal-footer"><button class="btn-secondary" data-close="modalUser">Annuler</button><button class="btn-primary" id="btnSaveUser">Enregistrer</button></div>
+</div></div>
 
-<!-- Poste -->
-<div class="modal-overlay" id="modalPost">
-  <div class="modal">
-    <div class="modal-header"><div class="modal-title" id="postModalTitle">Ajouter un poste</div><button class="modal-close" onclick="closeModal('modalPost')">✕</button></div>
-    <div class="modal-body">
-      <div class="form-row">
-        <div class="form-group"><label>Nom du poste</label><input type="text" id="pName" placeholder="Caisse, Accueil…"></div>
-        <div class="form-group"><label>Rotation (heures)</label><input type="number" id="pRotation" min="1" max="24" value="4"></div>
-      </div>
-      <div class="form-group"><label>Couleur</label><div class="color-row" id="colorSwatches"></div></div>
-    </div>
-    <div class="modal-footer">
-      <button class="btn-secondary" onclick="closeModal('modalPost')">Annuler</button>
-      <button class="btn-primary" onclick="savePost()">Enregistrer</button>
-    </div>
+<div class="modal-overlay" id="modalPost"><div class="modal">
+  <div class="modal-header"><div class="modal-title" id="postModalTitle">Ajouter un poste</div><button class="modal-close" data-close="modalPost">✕</button></div>
+  <div class="modal-body">
+    <div class="form-row"><div class="form-group"><label>Nom</label><input type="text" id="pName"></div><div class="form-group"><label>Rotation (h)</label><input type="number" id="pRotation" min="1" max="24" value="4"></div></div>
+    <div class="form-group"><label>Couleur</label><div class="color-row" id="colorSwatches"></div></div>
   </div>
-</div>
+  <div class="modal-footer"><button class="btn-secondary" data-close="modalPost">Annuler</button><button class="btn-primary" id="btnSavePost">Enregistrer</button></div>
+</div></div>
 
-<!-- Créneau -->
-<div class="modal-overlay" id="modalSlot">
-  <div class="modal">
-    <div class="modal-header"><div class="modal-title" id="slotModalTitle">Ajouter un créneau</div><button class="modal-close" onclick="closeModal('modalSlot')">✕</button></div>
-    <div class="modal-body">
-      <div class="form-group"><label>Nom</label><input type="text" id="sName" placeholder="Matin, Après-midi…"></div>
-      <div class="form-row">
-        <div class="form-group"><label>Heure début</label><input type="time" id="sStart" value="08:00"></div>
-        <div class="form-group"><label>Heure fin</label><input type="time" id="sEnd" value="12:00"></div>
-      </div>
-    </div>
-    <div class="modal-footer">
-      <button class="btn-secondary" onclick="closeModal('modalSlot')">Annuler</button>
-      <button class="btn-primary" onclick="saveSlot()">Enregistrer</button>
-    </div>
+<div class="modal-overlay" id="modalSlot"><div class="modal">
+  <div class="modal-header"><div class="modal-title" id="slotModalTitle">Ajouter un créneau</div><button class="modal-close" data-close="modalSlot">✕</button></div>
+  <div class="modal-body">
+    <div class="form-group"><label>Nom</label><input type="text" id="sName"></div>
+    <div class="form-row"><div class="form-group"><label>Début</label><input type="time" id="sStart" value="08:00"></div><div class="form-group"><label>Fin</label><input type="time" id="sEnd" value="12:00"></div></div>
   </div>
-</div>
+  <div class="modal-footer"><button class="btn-secondary" data-close="modalSlot">Annuler</button><button class="btn-primary" id="btnSaveSlot">Enregistrer</button></div>
+</div></div>
 
 <div id="toast"></div>
 
-<script>
-// ═══════════════════════════════════════════════════════════
-//  STATE — chargé depuis Firestore via listeners temps réel
-// ═══════════════════════════════════════════════════════════
-let STATE = { users:[], posts:[], slots:[], assignments:[], leaves:[], requests:[] };
-let currentUser = null;
-let fbListeners = [];
+<script type="module">
+// ════════════════════════════════════════════════════════════════
+//  IMPORTS FIREBASE — tout dans ce seul bloc type="module"
+// ════════════════════════════════════════════════════════════════
+import { initializeApp }
+  from "https://www.gstatic.com/firebasejs/11.0.0/firebase-app.js";
+import { getFirestore, doc, setDoc, getDoc, collection,
+         getDocs, onSnapshot, deleteDoc }
+  from "https://www.gstatic.com/firebasejs/11.0.0/firebase-firestore.js";
+import { getAuth, signInWithEmailAndPassword, signOut,
+         onAuthStateChanged, createUserWithEmailAndPassword }
+  from "https://www.gstatic.com/firebasejs/11.0.0/firebase-auth.js";
 
-// ═══════════════════════════════════════════════════════════
-//  UTILS
-// ═══════════════════════════════════════════════════════════
-const uid  = () => Date.now().toString(36) + Math.random().toString(36).slice(2,6);
-const fmt  = d => d instanceof Date ? d.toISOString().slice(0,10) : d;
+// ════════════════════════════════════════════════════════════════
+//  ▼▼▼  COLLE TON firebaseConfig ICI  ▼▼▼
+// ════════════════════════════════════════════════════════════════
+const firebaseConfig = {
+    apiKey: "AIzaSyCHG2sg5BFbT4c2FiGORTgEXwFEJ-tEmew",
+    authDomain: "plan-boul.firebaseapp.com",
+    projectId: "plan-boul",
+    storageBucket: "plan-boul.firebasestorage.app",
+    messagingSenderId: "505110542086",
+    appId: "1:505110542086:web:652a4be790aa513e6b1087"
+  };
+// ════════════════════════════════════════════════════════════════
+//  ▲▲▲  FIN DE LA ZONE À MODIFIER  ▲▲▲
+// ════════════════════════════════════════════════════════════════
+
+const fbApp  = initializeApp(firebaseConfig);
+const db     = getFirestore(fbApp);
+const auth   = getAuth(fbApp);
+
+// ── STATE ────────────────────────────────────────────────────────
+let S = { users:[], posts:[], slots:[], assignments:[], leaves:[], requests:[] };
+let me = null;
+let unsubs = [];
+
+// ── UTILS ────────────────────────────────────────────────────────
+const uid     = () => Date.now().toString(36)+Math.random().toString(36).slice(2,6);
+const fmt     = d  => d instanceof Date ? d.toISOString().slice(0,10) : d;
 const addDays = (d,n) => { const r=new Date(d); r.setDate(r.getDate()+n); return r; };
-const startOfWeek = d => { const r=new Date(d); const day=r.getDay(); const diff=day===0?-6:1-day; r.setDate(r.getDate()+diff); return r; };
-const MONTHS = ['Janvier','Février','Mars','Avril','Mai','Juin','Juillet','Août','Septembre','Octobre','Novembre','Décembre'];
-const DAYS_S = ['Lun','Mar','Mer','Jeu','Ven','Sam','Dim'];
+const soW     = d => { const r=new Date(d),day=r.getDay(),diff=day===0?-6:1-day; r.setDate(r.getDate()+diff); return r; };
+const MONTHS  = ['Janvier','Février','Mars','Avril','Mai','Juin','Juillet','Août','Septembre','Octobre','Novembre','Décembre'];
+const DS      = ['Lun','Mar','Mer','Jeu','Ven','Sam','Dim'];
+const COLORS  = ['#4f7ef8','#2ecc71','#e74c3c','#f39c12','#9b59b6','#1abc9c','#e67e22','#e91e63','#00bcd4','#ff5722','#8bc34a','#607d8b'];
+const hA      = (h,a)=>{ const r=parseInt(h.slice(1,3),16),g=parseInt(h.slice(3,5),16),b=parseInt(h.slice(5,7),16); return `rgba(${r},${g},${b},${a})`; };
+const $       = id => document.getElementById(id);
+const val     = id => $(id).value;
 
-function toast(msg, type='info', ms=3000){
-  const el=document.createElement('div');
-  el.className=`toast-item ${type}`; el.textContent=msg;
-  document.getElementById('toast').appendChild(el);
-  setTimeout(()=>el.remove(), ms);
+function toast(msg,type='info',ms=3000){
+  const el=document.createElement('div'); el.className=`toast-item ${type}`; el.textContent=msg;
+  $('toast').appendChild(el); setTimeout(()=>el.remove(),ms);
 }
-function openModal(id){ document.getElementById(id).classList.add('open'); }
-function closeModal(id){ document.getElementById(id).classList.remove('open'); }
-function setSyncing(b){
-  document.getElementById('syncDot').className='sync-dot'+(b?' syncing':'');
-  document.getElementById('syncLabel').textContent=b?'Sync…':'Synchronisé';
-}
+function openM(id){ $(id).classList.add('open'); }
+function closeM(id){ $(id).classList.remove('open'); }
+function syncing(b){ $('syncDot').className='sync-dot'+(b?' syncing':''); $('syncLabel').textContent=b?'Sync…':'Synchronisé'; }
 
-document.querySelectorAll('.modal-overlay').forEach(o=>{
-  o.addEventListener('click',e=>{ if(e.target===o) o.classList.remove('open'); });
-});
+// ── MODAL INFRA ──────────────────────────────────────────────────
+document.querySelectorAll('[data-close]').forEach(btn=>btn.addEventListener('click',()=>closeM(btn.dataset.close)));
+document.querySelectorAll('.modal-overlay').forEach(o=>o.addEventListener('click',e=>{ if(e.target===o) o.classList.remove('open'); }));
 document.addEventListener('keydown',e=>{ if(e.key==='Escape') document.querySelectorAll('.modal-overlay.open').forEach(o=>o.classList.remove('open')); });
-document.getElementById('loginPass').addEventListener('keydown',e=>{ if(e.key==='Enter') doLogin(); });
 
-function hexAlpha(hex,a){
-  const r=parseInt(hex.slice(1,3),16),g=parseInt(hex.slice(3,5),16),b=parseInt(hex.slice(5,7),16);
-  return `rgba(${r},${g},${b},${a})`;
-}
+// ── FIREBASE HELPERS ─────────────────────────────────────────────
+const cRef = name => collection(db,name);
+const dRef = (name,id) => doc(db,name,id);
+async function fSet(col,id,data){ syncing(true); await setDoc(dRef(col,id),data); syncing(false); }
+async function fDel(col,id){ syncing(true); await deleteDoc(dRef(col,id)); syncing(false); }
 
-// ═══════════════════════════════════════════════════════════
-//  FIREBASE — collections helper
-// ═══════════════════════════════════════════════════════════
-function col(name){ return window._fb.collection(window._fb.db, name); }
-function docRef(name,id){ return window._fb.doc(window._fb.db, name, id); }
-
-async function fbSet(colName, id, data){ setSyncing(true); await window._fb.setDoc(docRef(colName,id), data); setSyncing(false); }
-async function fbDel(colName, id){ setSyncing(true); await window._fb.deleteDoc(docRef(colName,id)); setSyncing(false); }
-
-function startListeners(){
-  const collections = ['users','posts','slots','assignments','leaves','requests'];
-  collections.forEach(name=>{
-    const unsub = window._fb.onSnapshot(col(name), snap=>{
-      STATE[name] = snap.docs.map(d=>({id:d.id,...d.data()}));
-      onStateUpdate(name);
-    });
-    fbListeners.push(unsub);
-  });
-}
-
-function stopListeners(){ fbListeners.forEach(u=>u()); fbListeners=[]; }
-
-function onStateUpdate(name){
-  updateBadge();
-  if(['assignments','leaves','posts','slots','users'].includes(name)){
-    if(document.getElementById('page-planning').classList.contains('active')) renderCalendar();
-  }
-  if(['requests','leaves'].includes(name)){
-    if(document.getElementById('page-requests').classList.contains('active')) renderRequests();
-  }
-  if(['users','posts','slots'].includes(name)){
-    if(document.getElementById('page-settings').classList.contains('active')) renderSettings();
-  }
-}
-
-// ═══════════════════════════════════════════════════════════
-//  AUTH
-// ═══════════════════════════════════════════════════════════
-window._fb.onAuthStateChanged(window._fb.auth, async firebaseUser => {
-  document.getElementById('loadingScreen').style.display='none';
-  if(!firebaseUser){
-    document.getElementById('loginScreen').style.display='flex';
-    document.getElementById('app').classList.remove('visible');
-    stopListeners();
+// ── AUTH ─────────────────────────────────────────────────────────
+onAuthStateChanged(auth, async fbUser => {
+  $('loadingScreen').style.display='none';
+  if(!fbUser){
+    $('loginScreen').style.display='flex';
+    $('app').classList.remove('visible');
+    unsubs.forEach(u=>u()); unsubs=[];
     return;
   }
-  // Get user profile from Firestore
-  const snap = await window._fb.getDoc(docRef('users', firebaseUser.uid));
+  const snap=await getDoc(dRef('users',fbUser.uid));
   if(!snap.exists()){
-    // First admin — create profile
-    const profile = {id:firebaseUser.uid, name:'Administrateur', email:firebaseUser.email, role:'admin'};
-    await fbSet('users', firebaseUser.uid, profile);
-    currentUser = profile;
-  } else {
-    currentUser = {id:firebaseUser.uid, ...snap.data()};
-  }
+    const p={id:fbUser.uid,name:'Administrateur',email:fbUser.email,role:'admin'};
+    await fSet('users',fbUser.uid,p); me=p;
+  } else { me={id:fbUser.uid,...snap.data()}; }
   startApp();
 });
 
-async function doLogin(){
-  const email = document.getElementById('loginEmail').value.trim();
-  const pass  = document.getElementById('loginPass').value;
-  document.getElementById('loginError').textContent='';
-  try {
-    await window._fb.signInWithEmailAndPassword(window._fb.auth, email, pass);
-  } catch(e){
-    document.getElementById('loginError').textContent='Email ou mot de passe incorrect';
-  }
-}
-
-async function doLogout(){
-  stopListeners();
-  await window._fb.signOut(window._fb.auth);
-}
+$('btnLogin').addEventListener('click', async ()=>{
+  $('loginError').textContent='';
+  try{ await signInWithEmailAndPassword(auth,val('loginEmail'),val('loginPass')); }
+  catch(e){ $('loginError').textContent='Email ou mot de passe incorrect'; }
+});
+$('loginPass').addEventListener('keydown',e=>{ if(e.key==='Enter') $('btnLogin').click(); });
+$('btnLogout').addEventListener('click',async()=>{ unsubs.forEach(u=>u()); unsubs=[]; await signOut(auth); });
 
 function startApp(){
-  document.getElementById('loginScreen').style.display='none';
-  document.getElementById('app').classList.add('visible');
-  document.getElementById('topUsername').textContent=currentUser.name;
-  document.getElementById('topAvatar').textContent=currentUser.name.charAt(0).toUpperCase();
-  document.getElementById('topRole').textContent=currentUser.role==='admin'?'Admin':'Employé';
-  document.getElementById('topRole').className='badge '+(currentUser.role==='admin'?'badge-blue':'badge-gray');
-  document.querySelectorAll('.admin-only').forEach(el=>{ el.style.display=currentUser.role==='admin'?'':'none'; });
+  $('loginScreen').style.display='none';
+  $('app').classList.add('visible');
+  $('topUsername').textContent=me.name;
+  $('topAvatar').textContent=me.name.charAt(0).toUpperCase();
+  $('topRole').textContent=me.role==='admin'?'Admin':'Employé';
+  $('topRole').className='badge '+(me.role==='admin'?'badge-blue':'badge-gray');
+  document.querySelectorAll('.admin-only').forEach(el=>el.style.display=me.role==='admin'?'':'none');
   startListeners();
-  renderCalendar();
-  updateBadge();
+  renderCal();
 }
 
-// ═══════════════════════════════════════════════════════════
-//  PAGE NAV
-// ═══════════════════════════════════════════════════════════
+function startListeners(){
+  ['users','posts','slots','assignments','leaves','requests'].forEach(name=>{
+    unsubs.push(onSnapshot(cRef(name), snap=>{
+      S[name]=snap.docs.map(d=>({id:d.id,...d.data()}));
+      refresh(name);
+    }));
+  });
+}
+
+function refresh(name){
+  updateBadge();
+  if(['assignments','leaves','posts','slots','users'].includes(name) && $('page-planning').classList.contains('active')) renderCal();
+  if(['requests','leaves'].includes(name) && $('page-requests').classList.contains('active')) renderReqs();
+  if(['users','posts','slots'].includes(name) && $('page-settings').classList.contains('active')) renderSettings();
+}
+
+// ── PAGE NAV ─────────────────────────────────────────────────────
 function showPage(id){
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
   document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
-  document.getElementById('page-'+id).classList.add('active');
+  $('page-'+id).classList.add('active');
   document.querySelector(`[data-page="${id}"]`).classList.add('active');
-  if(id==='planning') renderCalendar();
-  if(id==='requests'){ renderRequests(); updateBadge(); }
+  if(id==='planning') renderCal();
+  if(id==='requests'){ renderReqs(); updateBadge(); }
   if(id==='settings') renderSettings();
 }
+$('navPlanning').addEventListener('click',()=>showPage('planning'));
+$('navRequests').addEventListener('click',()=>showPage('requests'));
+$('navSettings').addEventListener('click',()=>showPage('settings'));
+$('btnBell').addEventListener('click',()=>showPage('requests'));
 
-// ═══════════════════════════════════════════════════════════
-//  CALENDAR
-// ═══════════════════════════════════════════════════════════
+// ── CALENDAR ─────────────────────────────────────────────────────
 let calView='week', calDate=new Date();
-function setView(v){ calView=v; document.getElementById('btnWeek').classList.toggle('active',v==='week'); document.getElementById('btnMonth').classList.toggle('active',v==='month'); renderCalendar(); }
-function navCal(d){ if(calView==='week') calDate=addDays(calDate,d*7); else calDate=new Date(calDate.getFullYear(),calDate.getMonth()+d,1); renderCalendar(); }
-function navToday(){ calDate=new Date(); renderCalendar(); }
 
-function renderCalendar(){ calView==='week'?renderWeek():renderMonth(); checkConflicts(); }
+$('btnWeek').addEventListener('click',()=>{ calView='week'; $('btnWeek').classList.add('active'); $('btnMonth').classList.remove('active'); renderCal(); });
+$('btnMonth').addEventListener('click',()=>{ calView='month'; $('btnMonth').classList.add('active'); $('btnWeek').classList.remove('active'); renderCal(); });
+$('btnPrev').addEventListener('click',()=>{ calView==='week'?calDate=addDays(calDate,-7):calDate=new Date(calDate.getFullYear(),calDate.getMonth()-1,1); renderCal(); });
+$('btnNext').addEventListener('click',()=>{ calView==='week'?calDate=addDays(calDate,7):calDate=new Date(calDate.getFullYear(),calDate.getMonth()+1,1); renderCal(); });
+$('btnToday').addEventListener('click',()=>{ calDate=new Date(); renderCal(); });
+$('btnPDF').addEventListener('click',()=>window.print());
+$('btnExport').addEventListener('click',exportJSON);
+$('btnExport2').addEventListener('click',exportJSON);
+
+function renderCal(){ calView==='week'?renderWeek():renderMonth(); checkConflicts(); }
 
 function renderWeek(){
-  const monday=startOfWeek(calDate);
-  const days=Array.from({length:7},(_,i)=>addDays(monday,i));
-  const today=fmt(new Date());
-  const end=days[6];
-  document.getElementById('calLabel').textContent=`${monday.getDate()} ${MONTHS[monday.getMonth()].slice(0,3)} – ${end.getDate()} ${MONTHS[end.getMonth()].slice(0,3)} ${end.getFullYear()}`;
-  const slots=STATE.slots;
-  let html=`<div class="week-grid">`;
-  html+=`<div class="wh-corner"></div>`;
-  days.forEach(day=>{
-    const isT=fmt(day)===today;
-    html+=`<div class="wh-day${isT?' today':''}"><div class="day-name">${DAYS_S[(day.getDay()+6)%7]}</div><div class="day-num">${day.getDate()}</div></div>`;
-  });
-  if(!slots.length){
-    html+=`<div style="grid-column:1/-1;padding:32px;text-align:center;color:var(--text3)">Aucun créneau. Configurez-en dans Paramètres.</div>`;
-  } else {
-    slots.forEach(slot=>{
-      html+=`<div class="ws-label">${slot.start}<br>${slot.end}</div>`;
-      days.forEach(day=>{
-        const df=fmt(day),isT=df===today;
-        html+=`<div class="ws-cell${isT?' today-col':''}">${renderCellContent(df,slot.id)}</div>`;
-      });
-    });
-  }
-  html+=`</div>`;
-  document.getElementById('calendarContainer').innerHTML=html;
+  const mon=soW(calDate),days=Array.from({length:7},(_,i)=>addDays(mon,i)),td=fmt(new Date());
+  $('calLabel').textContent=`${mon.getDate()} ${MONTHS[mon.getMonth()].slice(0,3)} – ${days[6].getDate()} ${MONTHS[days[6].getMonth()].slice(0,3)} ${days[6].getFullYear()}`;
+  let h=`<div class="week-grid"><div class="wh-corner"></div>`;
+  days.forEach(d=>{ const t=fmt(d)===td; h+=`<div class="wh-day${t?' today':''}"><div class="dn">${DS[(d.getDay()+6)%7]}</div><div class="dd">${d.getDate()}</div></div>`; });
+  if(!S.slots.length){ h+=`<div style="grid-column:1/-1;padding:32px;text-align:center;color:var(--text3)">Aucun créneau. Configurez-en dans Paramètres.</div>`; }
+  else { S.slots.forEach(sl=>{ h+=`<div class="ws-label">${sl.start}<br>${sl.end}</div>`; days.forEach(d=>{ const df=fmt(d),t=df===td; h+=`<div class="ws-cell${t?' today-col':''}">${cellContent(df,sl.id)}</div>`; }); }); }
+  h+=`</div>`; $('calendarContainer').innerHTML=h;
 }
 
 function renderMonth(){
-  const year=calDate.getFullYear(),month=calDate.getMonth();
-  document.getElementById('calLabel').textContent=`${MONTHS[month]} ${year}`;
-  const today=fmt(new Date());
-  const first=new Date(year,month,1),last=new Date(year,month+1,0);
-  let startDay=(first.getDay()+6)%7,grid=[];
-  for(let i=0;i<startDay;i++) grid.push(addDays(first,-startDay+i));
-  for(let i=1;i<=last.getDate();i++) grid.push(new Date(year,month,i));
+  const y=calDate.getFullYear(),m=calDate.getMonth(),td=fmt(new Date());
+  $('calLabel').textContent=`${MONTHS[m]} ${y}`;
+  const first=new Date(y,m,1),last=new Date(y,m+1,0),start=(first.getDay()+6)%7;
+  let grid=[];
+  for(let i=0;i<start;i++) grid.push(addDays(first,-start+i));
+  for(let i=1;i<=last.getDate();i++) grid.push(new Date(y,m,i));
   while(grid.length%7) grid.push(addDays(grid[grid.length-1],1));
-  let html=`<div class="month-grid">`;
-  DAYS_S.forEach(n=>html+=`<div class="month-day-header">${n}</div>`);
-  grid.forEach(day=>{
-    const df=fmt(day),isT=df===today,other=day.getMonth()!==month;
-    html+=`<div class="month-cell${isT?' today-cell':''}${other?' other-month':''}"><div class="mc-num">${day.getDate()}</div><div class="mc-chips">${renderMonthChips(df)}</div></div>`;
-  });
-  html+=`</div>`;
-  document.getElementById('calendarContainer').innerHTML=html;
+  let h=`<div class="month-grid">`;
+  DS.forEach(n=>h+=`<div class="month-day-hdr">${n}</div>`);
+  grid.forEach(d=>{ const df=fmt(d),t=df===td,other=d.getMonth()!==m; h+=`<div class="month-cell${t?' today-cell':''}${other?' other-month':''}"><div class="mc-num">${d.getDate()}</div>${monthChips(df)}</div>`; });
+  h+=`</div>`; $('calendarContainer').innerHTML=h;
 }
 
-function renderMonthChips(df){
-  let html='';
-  let assigns=STATE.assignments.filter(a=>a.date===df);
-  if(currentUser.role!=='admin') assigns=assigns.filter(a=>a.userId===currentUser.id);
-  assigns.slice(0,3).forEach(a=>{
-    const post=STATE.posts.find(p=>p.id===a.postId);
-    const user=STATE.users.find(u=>u.id===a.userId);
-    const conflict=isConflict(a);
-    const color=post?.color||'#4f7ef8';
-    html+=`<div class="assign-chip${conflict?' conflict':''}" style="background:${hexAlpha(color,.25)};color:${color}" onclick="clickChip('${a.id}')">${user?.name?.split(' ')[0]||'?'} · ${post?.name||'?'}</div>`;
-  });
-  if(assigns.length>3) html+=`<div style="font-size:10px;color:var(--text3)">+${assigns.length-3} autres</div>`;
-  let leaves=STATE.leaves.filter(l=>df>=l.start&&df<=l.end);
-  if(currentUser.role!=='admin') leaves=leaves.filter(l=>l.userId===currentUser.id);
-  leaves.slice(0,2).forEach(l=>{
-    const user=STATE.users.find(u=>u.id===l.userId);
-    html+=`<div class="leave-chip${l.status==='pending'?' pending':l.status==='refused'?' refused':''}" onclick="clickLeave('${l.id}')">${user?.name?.split(' ')[0]||'?'} ${l.type}</div>`;
-  });
-  return html;
+function monthChips(df){
+  let h='';
+  let assigns=S.assignments.filter(a=>a.date===df);
+  if(me.role!=='admin') assigns=assigns.filter(a=>a.userId===me.id);
+  assigns.slice(0,3).forEach(a=>{ const p=S.posts.find(x=>x.id===a.postId),u=S.users.find(x=>x.id===a.userId),c=isConflict(a),col=p?.color||'#4f7ef8'; h+=`<div class="assign-chip${c?' conflict':''}" style="background:${hA(col,.25)};color:${col}" data-chip="${a.id}">${u?.name?.split(' ')[0]||'?'} · ${p?.name||'?'}</div>`; });
+  if(assigns.length>3) h+=`<div style="font-size:10px;color:var(--text3)">+${assigns.length-3}</div>`;
+  let leaves=S.leaves.filter(l=>df>=l.start&&df<=l.end);
+  if(me.role!=='admin') leaves=leaves.filter(l=>l.userId===me.id);
+  leaves.slice(0,2).forEach(l=>{ const u=S.users.find(x=>x.id===l.userId); h+=`<div class="leave-chip${l.status==='pending'?' pending':l.status==='refused'?' refused':''}" data-leave="${l.id}">${u?.name?.split(' ')[0]||'?'} ${l.type}</div>`; });
+  return h;
 }
 
-function renderCellContent(df,slotId){
-  let html='';
-  let assigns=STATE.assignments.filter(a=>a.date===df&&a.slotId===slotId);
-  if(currentUser.role!=='admin') assigns=assigns.filter(a=>a.userId===currentUser.id);
-  assigns.forEach(a=>{
-    const post=STATE.posts.find(p=>p.id===a.postId);
-    const user=STATE.users.find(u=>u.id===a.userId);
-    const conflict=isConflict(a);
-    const color=post?.color||'#4f7ef8';
-    html+=`<div class="assign-chip${conflict?' conflict':''}" style="background:${hexAlpha(color,.25)};color:${color}" onclick="clickChip('${a.id}')" title="${user?.name||''} – ${post?.name||''}"><span>${user?.name?.split(' ')[0]||'?'}</span><span style="opacity:.7">·</span><span>${post?.name||'?'}</span></div>`;
-  });
-  if(slotId===STATE.slots[0]?.id){
-    let leaves=STATE.leaves.filter(l=>df>=l.start&&df<=l.end);
-    if(currentUser.role!=='admin') leaves=leaves.filter(l=>l.userId===currentUser.id);
-    leaves.forEach(l=>{
-      const user=STATE.users.find(u=>u.id===l.userId);
-      html+=`<div class="leave-chip${l.status==='pending'?' pending':l.status==='refused'?' refused':''}" onclick="clickLeave('${l.id}')">${user?.name?.split(' ')[0]||'?'} – ${l.type}</div>`;
-    });
-  }
-  return html;
+function cellContent(df,slotId){
+  let h='';
+  let assigns=S.assignments.filter(a=>a.date===df&&a.slotId===slotId);
+  if(me.role!=='admin') assigns=assigns.filter(a=>a.userId===me.id);
+  assigns.forEach(a=>{ const p=S.posts.find(x=>x.id===a.postId),u=S.users.find(x=>x.id===a.userId),c=isConflict(a),col=p?.color||'#4f7ef8'; h+=`<div class="assign-chip${c?' conflict':''}" style="background:${hA(col,.25)};color:${col}" data-chip="${a.id}">${u?.name?.split(' ')[0]||'?'} · ${p?.name||'?'}</div>`; });
+  if(slotId===S.slots[0]?.id){ let leaves=S.leaves.filter(l=>df>=l.start&&df<=l.end); if(me.role!=='admin') leaves=leaves.filter(l=>l.userId===me.id); leaves.forEach(l=>{ const u=S.users.find(x=>x.id===l.userId); h+=`<div class="leave-chip${l.status==='pending'?' pending':l.status==='refused'?' refused':''}" data-leave="${l.id}">${u?.name?.split(' ')[0]||'?'} – ${l.type}</div>`; }); }
+  return h;
 }
 
-function isConflict(a){
-  return STATE.assignments.some(b=>b.id!==a.id&&b.date===a.date&&b.slotId===a.slotId&&b.postId===a.postId);
-}
+$('calendarContainer').addEventListener('click',e=>{
+  const chip=e.target.closest('[data-chip]'); if(chip) clickChip(chip.dataset.chip);
+  const lv=e.target.closest('[data-leave]'); if(lv) clickLeave(lv.dataset.leave);
+});
+
+function isConflict(a){ return S.assignments.some(b=>b.id!==a.id&&b.date===a.date&&b.slotId===a.slotId&&b.postId===a.postId); }
 
 function checkConflicts(){
-  const conflicts=STATE.assignments.filter(a=>isConflict(a));
-  const banner=document.getElementById('conflictBanner');
-  if(conflicts.length){
-    const posts=[...new Set(conflicts.map(a=>STATE.posts.find(p=>p.id===a.postId)?.name||'?'))];
-    document.getElementById('conflictMsg').textContent=`${conflicts.length} doublon(s) : ${posts.join(', ')}`;
-    banner.style.display='flex';
-  } else { banner.style.display='none'; }
+  const c=S.assignments.filter(a=>isConflict(a));
+  if(c.length){ const ps=[...new Set(c.map(a=>S.posts.find(p=>p.id===a.postId)?.name||'?'))]; $('conflictMsg').textContent=`${c.length} doublon(s) : ${ps.join(', ')}`; $('conflictBanner').style.display='flex'; }
+  else $('conflictBanner').style.display='none';
 }
 
-// ═══════════════════════════════════════════════════════════
-//  CHIP CLICK
-// ═══════════════════════════════════════════════════════════
+// ── CHIP CLICK ───────────────────────────────────────────────────
 function clickChip(aid){
-  const a=STATE.assignments.find(x=>x.id===aid); if(!a) return;
-  const post=STATE.posts.find(p=>p.id===a.postId);
-  const user=STATE.users.find(u=>u.id===a.userId);
-  const slot=STATE.slots.find(s=>s.id===a.slotId);
-  const conflict=isConflict(a);
-  document.getElementById('chipTitle').textContent=`${post?.name||'?'} — ${a.date}`;
-  let body=`<div class="form-group"><label>Employé</label><div>${user?.name||'?'}</div></div>
-    <div class="form-group"><label>Créneau</label><div>${slot?.name||'?'} (${slot?.start||''}–${slot?.end||''})</div></div>`;
-  if(conflict) body+=`<div class="conflict-banner">⚠️ Doublon sur ce créneau.</div>`;
-  let footer='';
-  if(currentUser.role==='admin') footer+=`<button class="btn-danger btn-sm" onclick="deleteAssignment('${aid}')">Supprimer</button>`;
-  footer+=`<button class="btn-secondary btn-sm" onclick="closeModal('modalChip')">Fermer</button>`;
-  document.getElementById('chipBody').innerHTML=body;
-  document.getElementById('chipFooter').innerHTML=footer;
-  openModal('modalChip');
-}
-
-async function deleteAssignment(aid){
-  await fbDel('assignments',aid);
-  closeModal('modalChip');
-  toast('Affectation supprimée','success');
+  const a=S.assignments.find(x=>x.id===aid); if(!a) return;
+  const p=S.posts.find(x=>x.id===a.postId),u=S.users.find(x=>x.id===a.userId),sl=S.slots.find(x=>x.id===a.slotId),c=isConflict(a);
+  $('chipTitle').textContent=`${p?.name||'?'} — ${a.date}`;
+  $('chipBody').innerHTML=`<div class="form-group"><label>Employé</label><div>${u?.name||'?'}</div></div><div class="form-group"><label>Créneau</label><div>${sl?.name||'?'} (${sl?.start||''}–${sl?.end||''})</div></div>${c?`<div class="conflict-banner">⚠️ Doublon sur ce créneau.</div>`:''}`;
+  $('chipFooter').innerHTML='';
+  if(me.role==='admin'){ const b=mkBtn('btn-danger btn-sm','Supprimer',async()=>{ await fDel('assignments',aid); closeM('modalChip'); toast('Supprimé','success'); }); $('chipFooter').appendChild(b); }
+  $('chipFooter').appendChild(mkBtn('btn-secondary btn-sm','Fermer',()=>closeM('modalChip')));
+  openM('modalChip');
 }
 
 function clickLeave(lid){
-  const l=STATE.leaves.find(x=>x.id===lid); if(!l) return;
-  const user=STATE.users.find(u=>u.id===l.userId);
-  document.getElementById('chipTitle').textContent=`Congé — ${user?.name||'?'}`;
-  let body=`<div class="form-group"><label>Type</label><div>${l.type}</div></div>
-    <div class="form-group"><label>Période</label><div>${l.start} → ${l.end}</div></div>
-    <div class="form-group"><label>Statut</label><div class="badge ${l.status==='approved'?'badge-green':l.status==='refused'?'badge-red':'badge-orange'}">${l.status==='approved'?'Approuvé':l.status==='refused'?'Refusé':'En attente'}</div></div>`;
-  if(l.note) body+=`<div class="form-group"><label>Note</label><div>${l.note}</div></div>`;
-  let footer='';
-  if(currentUser.role==='admin'&&l.status==='pending'){
-    footer+=`<button class="btn-success btn-sm" onclick="approveLeave('${lid}',true)">✓ Approuver</button>
-    <button class="btn-danger btn-sm" onclick="approveLeave('${lid}',false)">✕ Refuser</button>`;
+  const l=S.leaves.find(x=>x.id===lid); if(!l) return;
+  const u=S.users.find(x=>x.id===l.userId);
+  $('chipTitle').textContent=`Congé — ${u?.name||'?'}`;
+  const sb=l.status==='approved'?'badge-green':l.status==='refused'?'badge-red':'badge-orange';
+  const sl=l.status==='approved'?'Approuvé':l.status==='refused'?'Refusé':'En attente';
+  $('chipBody').innerHTML=`<div class="form-group"><label>Type</label><div>${l.type}</div></div><div class="form-group"><label>Période</label><div>${l.start} → ${l.end}</div></div><div class="form-group"><label>Statut</label><span class="badge ${sb}">${sl}</span></div>${l.note?`<div class="form-group"><label>Note</label><div>${l.note}</div></div>`:''}`;
+  $('chipFooter').innerHTML='';
+  if(me.role==='admin'&&l.status==='pending'){
+    $('chipFooter').appendChild(mkBtn('btn-success btn-sm','✓ Approuver',async()=>{ await fSet('leaves',lid,{...l,status:'approved'}); closeM('modalChip'); toast('Approuvé','success'); }));
+    $('chipFooter').appendChild(mkBtn('btn-danger btn-sm','✕ Refuser',async()=>{ await fSet('leaves',lid,{...l,status:'refused'}); closeM('modalChip'); toast('Refusé','error'); }));
   }
-  footer+=`<button class="btn-secondary btn-sm" onclick="closeModal('modalChip')">Fermer</button>`;
-  document.getElementById('chipBody').innerHTML=body;
-  document.getElementById('chipFooter').innerHTML=footer;
-  openModal('modalChip');
+  $('chipFooter').appendChild(mkBtn('btn-secondary btn-sm','Fermer',()=>closeM('modalChip')));
+  openM('modalChip');
 }
 
-async function approveLeave(lid,approve){
-  const l=STATE.leaves.find(x=>x.id===lid); if(!l) return;
-  await fbSet('leaves',lid,{...l,status:approve?'approved':'refused'});
-  closeModal('modalChip');
-  toast(approve?'Congé approuvé':'Congé refusé',approve?'success':'error');
-}
+function mkBtn(cls,txt,fn){ const b=document.createElement('button'); b.className=cls; b.textContent=txt; b.addEventListener('click',fn); return b; }
 
-// ═══════════════════════════════════════════════════════════
-//  ASSIGN MODAL
-// ═══════════════════════════════════════════════════════════
-function openAssignModal(){
-  document.getElementById('aUser').innerHTML=STATE.users.map(u=>`<option value="${u.id}">${u.name}</option>`).join('');
-  document.getElementById('aPost').innerHTML=STATE.posts.map(p=>`<option value="${p.id}">${p.name}</option>`).join('');
-  document.getElementById('aSlot').innerHTML=STATE.slots.map(s=>`<option value="${s.id}">${s.name} (${s.start}–${s.end})</option>`).join('');
-  document.getElementById('aDate').value=fmt(new Date());
-  document.getElementById('aConflictWarn').style.display='none';
-  ['aUser','aPost','aDate','aSlot'].forEach(id=>{ document.getElementById(id).onchange=checkAssignConflict; });
-  openModal('modalAssign');
-}
+// ── ASSIGN ───────────────────────────────────────────────────────
+$('btnAssign').addEventListener('click',()=>{
+  $('aUser').innerHTML=S.users.map(u=>`<option value="${u.id}">${u.name}</option>`).join('');
+  $('aPost').innerHTML=S.posts.map(p=>`<option value="${p.id}">${p.name}</option>`).join('');
+  $('aSlot').innerHTML=S.slots.map(s=>`<option value="${s.id}">${s.name} (${s.start}–${s.end})</option>`).join('');
+  $('aDate').value=fmt(new Date()); $('aConflictWarn').style.display='none';
+  ['aUser','aPost','aDate','aSlot'].forEach(id=>$(id).addEventListener('change',()=>{
+    $('aConflictWarn').style.display=S.assignments.some(a=>a.date===val('aDate')&&a.slotId===val('aSlot')&&a.postId===val('aPost'))?'flex':'none';
+  }));
+  openM('modalAssign');
+});
+$('btnSaveAssign').addEventListener('click',async()=>{
+  if(!val('aDate')){toast('Date requise','error');return;}
+  const id=uid(); await fSet('assignments',id,{id,userId:val('aUser'),postId:val('aPost'),date:val('aDate'),slotId:val('aSlot')});
+  closeM('modalAssign'); toast('Affectation enregistrée','success');
+});
 
-function checkAssignConflict(){
-  const date=document.getElementById('aDate').value;
-  const slotId=document.getElementById('aSlot').value;
-  const postId=document.getElementById('aPost').value;
-  const conflict=STATE.assignments.some(a=>a.date===date&&a.slotId===slotId&&a.postId===postId);
-  document.getElementById('aConflictWarn').style.display=conflict?'flex':'none';
-}
-
-async function saveAssignment(){
-  const a={userId:document.getElementById('aUser').value,postId:document.getElementById('aPost').value,date:document.getElementById('aDate').value,slotId:document.getElementById('aSlot').value};
-  if(!a.date){toast('Date requise','error');return;}
-  const id=uid();
-  await fbSet('assignments',id,{...a,id});
-  closeModal('modalAssign');
-  toast('Affectation enregistrée','success');
-}
-
-// ═══════════════════════════════════════════════════════════
-//  LEAVE
-// ═══════════════════════════════════════════════════════════
-function openLeaveModal(){
-  const lg=document.getElementById('leaveUserGroup');
-  if(currentUser.role==='admin'){
-    lg.style.display='';
-    document.getElementById('lUser').innerHTML=STATE.users.map(u=>`<option value="${u.id}">${u.name}</option>`).join('');
-  } else { lg.style.display='none'; }
-  document.getElementById('lStart').value=fmt(new Date());
-  document.getElementById('lEnd').value=fmt(new Date());
-  document.getElementById('lNote').value='';
-  openModal('modalLeave');
-}
-
-async function saveLeave(){
-  const start=document.getElementById('lStart').value,end=document.getElementById('lEnd').value;
+// ── LEAVE ────────────────────────────────────────────────────────
+$('btnLeave').addEventListener('click',()=>{
+  const lg=$('leaveUserGroup');
+  if(me.role==='admin'){ lg.style.display=''; $('lUser').innerHTML=S.users.map(u=>`<option value="${u.id}">${u.name}</option>`).join(''); }
+  else lg.style.display='none';
+  $('lStart').value=fmt(new Date()); $('lEnd').value=fmt(new Date()); $('lNote').value='';
+  openM('modalLeave');
+});
+$('btnSaveLeave').addEventListener('click',async()=>{
+  const start=val('lStart'),end=val('lEnd');
   if(!start||!end){toast('Dates requises','error');return;}
   if(start>end){toast('Fin avant début','error');return;}
   const id=uid();
-  const l={id,userId:currentUser.role==='admin'?document.getElementById('lUser').value:currentUser.id,
-    type:document.getElementById('lType').value,start,end,
-    note:document.getElementById('lNote').value,
-    status:currentUser.role==='admin'?'approved':'pending',
-    createdAt:new Date().toISOString()};
-  await fbSet('leaves',id,l);
-  closeModal('modalLeave');
-  toast('Congé déclaré','success');
-}
+  await fSet('leaves',id,{id,userId:me.role==='admin'?val('lUser'):me.id,type:val('lType'),start,end,note:val('lNote'),status:me.role==='admin'?'approved':'pending',createdAt:new Date().toISOString()});
+  closeM('modalLeave'); toast('Congé déclaré','success');
+});
 
-// ═══════════════════════════════════════════════════════════
-//  CHANGE REQUEST
-// ═══════════════════════════════════════════════════════════
-function openChangeRequestModal(){
-  const myAssigns=STATE.assignments.filter(a=>a.userId===currentUser.id);
-  document.getElementById('crFrom').innerHTML=myAssigns.length===0
-    ?`<option value="">Aucune affectation</option>`
-    :myAssigns.map(a=>{
-      const p=STATE.posts.find(x=>x.id===a.postId),s=STATE.slots.find(x=>x.id===a.slotId);
-      return `<option value="${a.id}">${a.date} – ${p?.name||'?'} (${s?.name||'?'})</option>`;
-    }).join('');
-
-  const others=STATE.assignments.filter(a=>a.userId!==currentUser.id);
-  const freeSlots=[];
-  STATE.slots.forEach(s=>{
-    for(let i=0;i<14;i++){
-      const dd=fmt(addDays(new Date(),i));
-      if(!STATE.assignments.some(a=>a.slotId===s.id&&a.date===dd))
-        freeSlots.push(`<option value="free|${dd}|${s.id}">${dd} – ${s.name} (libre)</option>`);
-    }
-  });
-  const otherOpts=others.map(a=>{
-    const p=STATE.posts.find(x=>x.id===a.postId),s=STATE.slots.find(x=>x.id===a.slotId),u=STATE.users.find(x=>x.id===a.userId);
-    return `<option value="assign|${a.id}">${a.date} – ${p?.name||'?'} (${s?.name||'?'}) · ${u?.name||'?'}</option>`;
-  });
-  document.getElementById('crTo').innerHTML=[...freeSlots.slice(0,30),...otherOpts].join('')||`<option value="">Aucun créneau</option>`;
-  document.getElementById('crNote').value='';
-  openModal('modalChangeReq');
-}
-
-async function saveChangeRequest(){
-  const fromId=document.getElementById('crFrom').value,toVal=document.getElementById('crTo').value,note=document.getElementById('crNote').value;
+// ── CHANGE REQUEST ───────────────────────────────────────────────
+$('btnChange').addEventListener('click',()=>{
+  const myA=S.assignments.filter(a=>a.userId===me.id);
+  $('crFrom').innerHTML=myA.length?myA.map(a=>{ const p=S.posts.find(x=>x.id===a.postId),sl=S.slots.find(x=>x.id===a.slotId); return `<option value="${a.id}">${a.date} – ${p?.name||'?'} (${sl?.name||'?'})</option>`; }).join(''):`<option value="">Aucune affectation</option>`;
+  const others=S.assignments.filter(a=>a.userId!==me.id);
+  const free=[];
+  S.slots.forEach(sl=>{ for(let i=0;i<14;i++){ const dd=fmt(addDays(new Date(),i)); if(!S.assignments.some(a=>a.slotId===sl.id&&a.date===dd)) free.push(`<option value="free|${dd}|${sl.id}">${dd} – ${sl.name} (libre)</option>`); } });
+  const otherO=others.map(a=>{ const p=S.posts.find(x=>x.id===a.postId),sl=S.slots.find(x=>x.id===a.slotId),u=S.users.find(x=>x.id===a.userId); return `<option value="assign|${a.id}">${a.date} – ${p?.name||'?'} (${sl?.name||'?'}) · ${u?.name||'?'}</option>`; });
+  $('crTo').innerHTML=[...free.slice(0,30),...otherO].join('')||`<option value="">Aucun créneau</option>`;
+  $('crNote').value=''; openM('modalChangeReq');
+});
+$('btnSaveChange').addEventListener('click',async()=>{
+  const fromId=val('crFrom'),toVal=val('crTo'),note=val('crNote');
   if(!fromId||!toVal){toast('Sélectionnez les créneaux','error');return;}
   const id=uid();
-  await fbSet('requests',id,{id,type:'change',userId:currentUser.id,fromAssignId:fromId,toVal,note,status:'pending',createdAt:new Date().toISOString()});
-  closeModal('modalChangeReq');
-  toast('Demande envoyée','success');
-}
+  await fSet('requests',id,{id,type:'change',userId:me.id,fromAssignId:fromId,toVal,note,status:'pending',createdAt:new Date().toISOString()});
+  closeM('modalChangeReq'); toast('Demande envoyée','success');
+});
 
-// ═══════════════════════════════════════════════════════════
-//  REQUESTS PAGE
-// ═══════════════════════════════════════════════════════════
-function renderRequests(){
-  const container=document.getElementById('requestsList');
+// ── REQUESTS PAGE ────────────────────────────────────────────────
+function renderReqs(){
+  const container=$('requestsList'); container.innerHTML='';
   let items=[];
-
-  let reqs=STATE.requests;
-  if(currentUser.role!=='admin') reqs=reqs.filter(r=>r.userId===currentUser.id);
+  const reqs=me.role==='admin'?S.requests:S.requests.filter(r=>r.userId===me.id);
   reqs.forEach(r=>{
-    const u=STATE.users.find(x=>x.id===r.userId);
-    const fa=STATE.assignments.find(a=>a.id===r.fromAssignId);
-    const fp=STATE.posts.find(p=>p.id===fa?.postId),fs=STATE.slots.find(s=>s.id===fa?.slotId);
-    let toDesc=r.toVal;
-    if(r.toVal?.startsWith('assign|')){
-      const ta=STATE.assignments.find(a=>a.id===r.toVal.split('|')[1]);
-      const tp=STATE.posts.find(p=>p.id===ta?.postId),ts=STATE.slots.find(s=>s.id===ta?.slotId),tu=STATE.users.find(u=>u.id===ta?.userId);
-      toDesc=`${ta?.date||'?'} – ${tp?.name||'?'} (${ts?.name||'?'}) · ${tu?.name||'?'}`;
-    } else if(r.toVal?.startsWith('free|')){
-      const [,date,slotId]=r.toVal.split('|');
-      const ts=STATE.slots.find(s=>s.id===slotId);
-      toDesc=`${date} – ${ts?.name||'?'} (libre)`;
-    }
+    const u=S.users.find(x=>x.id===r.userId),fa=S.assignments.find(a=>a.id===r.fromAssignId);
+    const fp=S.posts.find(p=>p.id===fa?.postId),fs=S.slots.find(s=>s.id===fa?.slotId);
+    let toD=r.toVal||'';
+    if(toD.startsWith('assign|')){ const ta=S.assignments.find(a=>a.id===toD.split('|')[1]),tp=S.posts.find(p=>p.id===ta?.postId),ts=S.slots.find(s=>s.id===ta?.slotId),tu=S.users.find(u=>u.id===ta?.userId); toD=`${ta?.date||'?'} – ${tp?.name||'?'} (${ts?.name||'?'}) · ${tu?.name||'?'}`; }
+    else if(toD.startsWith('free|')){ const [,date,slotId]=toD.split('|'),ts=S.slots.find(s=>s.id===slotId); toD=`${date} – ${ts?.name||'?'} (libre)`; }
     const sb=r.status==='approved'?'badge-green':r.status==='refused'?'badge-red':'badge-orange';
     const sl=r.status==='approved'?'Approuvée':r.status==='refused'?'Refusée':'En attente';
-    let actions='';
-    if(currentUser.role==='admin'&&r.status==='pending'){
-      actions=`<button class="btn-success btn-sm" onclick="approveRequest('${r.id}',true)">✓</button>
-               <button class="btn-danger btn-sm" onclick="approveRequest('${r.id}',false)">✕</button>`;
+    const div=document.createElement('div'); div.className='req-card';
+    div.innerHTML=`<div class="req-icon">🔄</div><div class="req-info"><div class="req-title">${u?.name||'?'} — Changement <span class="badge ${sb}">${sl}</span></div><div class="req-meta">De : ${fa?.date||'?'} – ${fp?.name||'?'} (${fs?.name||'?'})</div><div class="req-meta">Vers : ${toD}</div>${r.note?`<div class="req-meta">${r.note}</div>`:''}<div class="req-meta" style="font-size:11px">${new Date(r.createdAt).toLocaleString('fr-FR')}</div></div><div class="req-actions" id="ra_r_${r.id}"></div>`;
+    if(me.role==='admin'&&r.status==='pending'){
+      const ra=div.querySelector('#ra_r_'+r.id);
+      ra.appendChild(mkBtn('btn-success btn-sm','✓',async()=>{ await approveReq(r.id,true); }));
+      ra.appendChild(mkBtn('btn-danger btn-sm','✕',async()=>{ await approveReq(r.id,false); }));
     }
-    items.push(`<div class="req-card"><div class="req-icon">🔄</div><div class="req-info">
-      <div class="req-title">${u?.name||'?'} — Changement <span class="badge ${sb}">${sl}</span></div>
-      <div class="req-meta">De : ${fa?.date||'?'} – ${fp?.name||'?'} (${fs?.name||'?'})</div>
-      <div class="req-meta">Vers : ${toDesc}</div>
-      ${r.note?`<div class="req-meta" style="color:var(--text)">${r.note}</div>`:''}
-      <div class="req-meta" style="font-size:11px">${new Date(r.createdAt).toLocaleString('fr-FR')}</div>
-    </div><div class="req-actions">${actions}</div></div>`);
+    items.push(div);
   });
-
-  let leaves=STATE.leaves;
-  if(currentUser.role!=='admin') leaves=leaves.filter(l=>l.userId===currentUser.id);
+  const leaves=me.role==='admin'?S.leaves:S.leaves.filter(l=>l.userId===me.id);
   leaves.forEach(l=>{
-    const u=STATE.users.find(x=>x.id===l.userId);
+    const u=S.users.find(x=>x.id===l.userId);
     const sb=l.status==='approved'?'badge-green':l.status==='refused'?'badge-red':'badge-orange';
     const sl=l.status==='approved'?'Approuvé':l.status==='refused'?'Refusé':'En attente';
-    let actions='';
-    if(currentUser.role==='admin'&&l.status==='pending'){
-      actions=`<button class="btn-success btn-sm" onclick="approveLeave('${l.id}',true)">✓</button>
-               <button class="btn-danger btn-sm" onclick="approveLeave('${l.id}',false)">✕</button>`;
+    const div=document.createElement('div'); div.className='req-card';
+    div.innerHTML=`<div class="req-icon">🏖️</div><div class="req-info"><div class="req-title">${u?.name||'?'} — ${l.type} <span class="badge ${sb}">${sl}</span></div><div class="req-meta">${l.start} → ${l.end}</div>${l.note?`<div class="req-meta">${l.note}</div>`:''}<div class="req-meta" style="font-size:11px">${new Date(l.createdAt).toLocaleString('fr-FR')}</div></div><div class="req-actions" id="ra_l_${l.id}"></div>`;
+    if(me.role==='admin'&&l.status==='pending'){
+      const ra=div.querySelector('#ra_l_'+l.id);
+      ra.appendChild(mkBtn('btn-success btn-sm','✓',async()=>{ await fSet('leaves',l.id,{...l,status:'approved'}); toast('Approuvé','success'); }));
+      ra.appendChild(mkBtn('btn-danger btn-sm','✕',async()=>{ await fSet('leaves',l.id,{...l,status:'refused'}); toast('Refusé','error'); }));
     }
-    items.push(`<div class="req-card"><div class="req-icon">🏖️</div><div class="req-info">
-      <div class="req-title">${u?.name||'?'} — ${l.type} <span class="badge ${sb}">${sl}</span></div>
-      <div class="req-meta">${l.start} → ${l.end}</div>
-      ${l.note?`<div class="req-meta" style="color:var(--text)">${l.note}</div>`:''}
-      <div class="req-meta" style="font-size:11px">${new Date(l.createdAt).toLocaleString('fr-FR')}</div>
-    </div><div class="req-actions">${actions}</div></div>`);
+    items.push(div);
   });
-
-  container.innerHTML=items.length?items.join(''):`<div class="empty-state"><div class="icon">📭</div><p>Aucune demande</p></div>`;
+  if(items.length) items.forEach(el=>container.appendChild(el));
+  else container.innerHTML=`<div class="empty-state"><div class="icon">📭</div><p>Aucune demande</p></div>`;
 }
 
-async function approveRequest(rid,approve){
-  const r=STATE.requests.find(x=>x.id===rid); if(!r) return;
+async function approveReq(rid,approve){
+  const r=S.requests.find(x=>x.id===rid); if(!r) return;
   if(approve){
-    const fromA=STATE.assignments.find(a=>a.id===r.fromAssignId);
-    if(r.toVal?.startsWith('assign|')){
-      const toA=STATE.assignments.find(a=>a.id===r.toVal.split('|')[1]);
-      if(fromA&&toA){
-        const tmpUser=fromA.userId;
-        await fbSet('assignments',fromA.id,{...fromA,userId:toA.userId});
-        await fbSet('assignments',toA.id,{...toA,userId:tmpUser});
-      }
-    } else if(r.toVal?.startsWith('free|')){
-      const [,date,slotId]=r.toVal.split('|');
-      if(fromA) await fbSet('assignments',fromA.id,{...fromA,date,slotId});
-    }
+    const fa=S.assignments.find(a=>a.id===r.fromAssignId);
+    if(r.toVal?.startsWith('assign|')){ const ta=S.assignments.find(a=>a.id===r.toVal.split('|')[1]); if(fa&&ta){ await fSet('assignments',fa.id,{...fa,userId:ta.userId}); await fSet('assignments',ta.id,{...ta,userId:fa.userId}); } }
+    else if(r.toVal?.startsWith('free|')){ const [,date,slotId]=r.toVal.split('|'); if(fa) await fSet('assignments',fa.id,{...fa,date,slotId}); }
   }
-  await fbSet('requests',rid,{...r,status:approve?'approved':'refused'});
+  await fSet('requests',rid,{...r,status:approve?'approved':'refused'});
   toast(approve?'Demande acceptée':'Demande refusée',approve?'success':'error');
 }
 
 function updateBadge(){
-  const pending=STATE.requests.filter(r=>r.status==='pending').length+STATE.leaves.filter(l=>l.status==='pending').length;
-  const show=pending>0&&currentUser?.role==='admin';
-  document.getElementById('reqBadgeDot').style.display=show?'':'none';
-  document.getElementById('reqBadgeNav').textContent=show?` (${pending})`:'';
+  if(!me) return;
+  const n=S.requests.filter(r=>r.status==='pending').length+S.leaves.filter(l=>l.status==='pending').length;
+  const show=n>0&&me.role==='admin';
+  $('reqBadgeDot').style.display=show?'':'none';
+  $('reqBadgeNav').textContent=show?` (${n})`:'';
 }
 
-// ═══════════════════════════════════════════════════════════
-//  SETTINGS
-// ═══════════════════════════════════════════════════════════
+// ── SETTINGS ─────────────────────────────────────────────────────
 function renderSettings(){ renderUsersTable(); renderPostsTable(); renderSlotsTable(); }
 
 function renderUsersTable(){
-  document.getElementById('usersTbody').innerHTML=STATE.users.map(u=>`
-    <tr><td>${u.name}</td><td style="font-family:var(--mono);font-size:12px">${u.email||''}</td>
-    <td><span class="badge ${u.role==='admin'?'badge-blue':'badge-gray'}">${u.role==='admin'?'Admin':'Employé'}</span></td>
-    <td style="text-align:right">
-      <button class="btn-icon" onclick="openUserModal('${u.id}')">✏️</button>
-      ${u.id!==currentUser.id?`<button class="btn-icon" onclick="deleteUser('${u.id}')">🗑</button>`:''}
-    </td></tr>`).join('');
+  $('usersTbody').innerHTML=S.users.map(u=>`<tr><td>${u.name}</td><td style="font-family:var(--mono);font-size:12px">${u.email||''}</td><td><span class="badge ${u.role==='admin'?'badge-blue':'badge-gray'}">${u.role==='admin'?'Admin':'Employé'}</span></td><td style="text-align:right"><button class="btn-icon" data-eu="${u.id}">✏️</button>${u.id!==me.id?`<button class="btn-icon" data-du="${u.id}">🗑</button>`:''}</td></tr>`).join('');
 }
-
 function renderPostsTable(){
-  document.getElementById('postsTbody').innerHTML=STATE.posts.map(p=>`
-    <tr><td>${p.name}</td><td style="font-family:var(--mono);font-size:12px">${p.rotation}h</td>
-    <td><div style="width:20px;height:20px;border-radius:50%;background:${p.color}"></div></td>
-    <td style="text-align:right">
-      <button class="btn-icon" onclick="openPostModal('${p.id}')">✏️</button>
-      <button class="btn-icon" onclick="deletePost('${p.id}')">🗑</button>
-    </td></tr>`).join('');
+  $('postsTbody').innerHTML=S.posts.map(p=>`<tr><td>${p.name}</td><td style="font-family:var(--mono);font-size:12px">${p.rotation}h</td><td><div style="width:20px;height:20px;border-radius:50%;background:${p.color}"></div></td><td style="text-align:right"><button class="btn-icon" data-ep="${p.id}">✏️</button><button class="btn-icon" data-dp="${p.id}">🗑</button></td></tr>`).join('');
 }
-
 function renderSlotsTable(){
-  document.getElementById('slotsTbody').innerHTML=STATE.slots.map(s=>`
-    <tr><td>${s.name}</td><td style="font-family:var(--mono)">${s.start}</td><td style="font-family:var(--mono)">${s.end}</td>
-    <td style="text-align:right">
-      <button class="btn-icon" onclick="openSlotModal('${s.id}')">✏️</button>
-      <button class="btn-icon" onclick="deleteSlot('${s.id}')">🗑</button>
-    </td></tr>`).join('');
+  $('slotsTbody').innerHTML=S.slots.map(s=>`<tr><td>${s.name}</td><td style="font-family:var(--mono)">${s.start}</td><td style="font-family:var(--mono)">${s.end}</td><td style="text-align:right"><button class="btn-icon" data-es="${s.id}">✏️</button><button class="btn-icon" data-ds="${s.id}">🗑</button></td></tr>`).join('');
 }
 
-// USER MODAL
-let editingUserId=null;
-function openUserModal(id){
-  editingUserId=id||null;
-  const u=id?STATE.users.find(x=>x.id===id):null;
-  document.getElementById('userModalTitle').textContent=id?'Modifier':'Ajouter un utilisateur';
-  document.getElementById('uPassHint').textContent=id?'(vide = inchangé)':'';
-  document.getElementById('uName').value=u?.name||'';
-  document.getElementById('uEmail').value=u?.email||'';
-  document.getElementById('uPass').value='';
-  document.getElementById('uRole').value=u?.role||'employee';
-  openModal('modalUser');
-}
+document.addEventListener('click',e=>{
+  const eu=e.target.closest('[data-eu]'); if(eu) openUserModal(eu.dataset.eu);
+  const du=e.target.closest('[data-du]'); if(du) delUser(du.dataset.du);
+  const ep=e.target.closest('[data-ep]'); if(ep) openPostModal(ep.dataset.ep);
+  const dp=e.target.closest('[data-dp]'); if(dp) delPost(dp.dataset.dp);
+  const es=e.target.closest('[data-es]'); if(es) openSlotModal(es.dataset.es);
+  const ds=e.target.closest('[data-ds]'); if(ds) delSlot(ds.dataset.ds);
+});
 
-async function saveUser(){
-  const name=document.getElementById('uName').value.trim();
-  const email=document.getElementById('uEmail').value.trim();
-  const pass=document.getElementById('uPass').value;
-  const role=document.getElementById('uRole').value;
+// USER
+let eUid=null;
+$('btnAddUser').addEventListener('click',()=>openUserModal(null));
+function openUserModal(id){ eUid=id; const u=id?S.users.find(x=>x.id===id):null; $('userModalTitle').textContent=id?'Modifier':'Ajouter'; $('uPassHint').textContent=id?'(vide = inchangé)':''; $('uName').value=u?.name||''; $('uEmail').value=u?.email||''; $('uPass').value=''; $('uRole').value=u?.role||'employee'; openM('modalUser'); }
+$('btnSaveUser').addEventListener('click',async()=>{
+  const name=val('uName').trim(),email=val('uEmail').trim(),pass=val('uPass'),role=val('uRole');
   if(!name||!email){toast('Nom et email requis','error');return;}
-
-  if(editingUserId){
-    // Update profile only (Firebase Auth password change requires re-auth — hors scope)
-    const u=STATE.users.find(x=>x.id===editingUserId);
-    await fbSet('users',editingUserId,{...u,name,email,role});
-    toast('Profil mis à jour','success');
-  } else {
+  if(eUid){ const u=S.users.find(x=>x.id===eUid); await fSet('users',eUid,{...u,name,email,role}); toast('Mis à jour','success'); }
+  else{
     if(!pass){toast('Mot de passe requis','error');return;}
-    try{
-      // Create Firebase Auth account then Firestore profile
-      const cred=await window._fb.createUserWithEmailAndPassword(window._fb.auth,email,pass);
-      const id=cred.user.uid;
-      await fbSet('users',id,{id,name,email,role});
-      toast('Utilisateur créé','success');
-    } catch(e){
-      toast(e.code==='auth/email-already-in-use'?'Email déjà utilisé':e.message,'error');
-      return;
-    }
+    try{ const c=await createUserWithEmailAndPassword(auth,email,pass); await fSet('users',c.user.uid,{id:c.user.uid,name,email,role}); toast('Utilisateur créé','success'); }
+    catch(e){ toast(e.code==='auth/email-already-in-use'?'Email déjà utilisé':e.message,'error'); return; }
   }
-  closeModal('modalUser');
-}
+  closeM('modalUser');
+});
+async function delUser(id){ if(!confirm('Supprimer ?')) return; await fDel('users',id); toast('Supprimé','success'); }
 
-async function deleteUser(id){
-  if(!confirm('Supprimer cet utilisateur ?')) return;
-  await fbDel('users',id);
-  toast('Utilisateur supprimé','success');
-}
-
-// POST MODAL
-const POST_COLORS=['#4f7ef8','#2ecc71','#e74c3c','#f39c12','#9b59b6','#1abc9c','#e67e22','#e91e63','#00bcd4','#ff5722','#8bc34a','#607d8b'];
-let editingPostId=null,selectedColor=POST_COLORS[0];
-
-function openPostModal(id){
-  editingPostId=id||null;
-  const p=id?STATE.posts.find(x=>x.id===id):null;
-  document.getElementById('postModalTitle').textContent=id?'Modifier le poste':'Ajouter un poste';
-  document.getElementById('pName').value=p?.name||'';
-  document.getElementById('pRotation').value=p?.rotation||4;
-  selectedColor=p?.color||POST_COLORS[0];
-  renderColorSwatches();
-  openModal('modalPost');
-}
-
-function renderColorSwatches(){
-  document.getElementById('colorSwatches').innerHTML=POST_COLORS.map(c=>`<div class="color-swatch${c===selectedColor?' selected':''}" style="background:${c}" onclick="selectColor('${c}')"></div>`).join('');
-}
-function selectColor(c){ selectedColor=c; renderColorSwatches(); }
-
-async function savePost(){
-  const name=document.getElementById('pName').value.trim(),rotation=parseInt(document.getElementById('pRotation').value)||4;
+// POST
+let ePid=null,selColor=COLORS[0];
+$('btnAddPost').addEventListener('click',()=>openPostModal(null));
+function openPostModal(id){ ePid=id; const p=id?S.posts.find(x=>x.id===id):null; $('postModalTitle').textContent=id?'Modifier':'Ajouter un poste'; $('pName').value=p?.name||''; $('pRotation').value=p?.rotation||4; selColor=p?.color||COLORS[0]; renderSwatches(); openM('modalPost'); }
+function renderSwatches(){ $('colorSwatches').innerHTML=COLORS.map(c=>`<div class="color-swatch${c===selColor?' selected':''}" style="background:${c}" data-col="${c}"></div>`).join(''); }
+$('colorSwatches').addEventListener('click',e=>{ const s=e.target.closest('[data-col]'); if(s){ selColor=s.dataset.col; renderSwatches(); } });
+$('btnSavePost').addEventListener('click',async()=>{
+  const name=val('pName').trim(),rotation=parseInt(val('pRotation'))||4;
   if(!name){toast('Nom requis','error');return;}
-  if(editingPostId){
-    const p=STATE.posts.find(x=>x.id===editingPostId);
-    await fbSet('posts',editingPostId,{...p,name,rotation,color:selectedColor});
-  } else {
-    const id=uid();
-    await fbSet('posts',id,{id,name,rotation,color:selectedColor});
-  }
-  closeModal('modalPost');
-  toast('Poste enregistré','success');
-}
+  if(ePid){ const p=S.posts.find(x=>x.id===ePid); await fSet('posts',ePid,{...p,name,rotation,color:selColor}); }
+  else{ const id=uid(); await fSet('posts',id,{id,name,rotation,color:selColor}); }
+  closeM('modalPost'); toast('Poste enregistré','success');
+});
+async function delPost(id){ if(!confirm('Supprimer ?')) return; await fDel('posts',id); toast('Supprimé','success'); }
 
-async function deletePost(id){
-  if(!confirm('Supprimer ce poste ?')) return;
-  await fbDel('posts',id);
-  toast('Poste supprimé','success');
-}
-
-// SLOT MODAL
-let editingSlotId=null;
-function openSlotModal(id){
-  editingSlotId=id||null;
-  const s=id?STATE.slots.find(x=>x.id===id):null;
-  document.getElementById('slotModalTitle').textContent=id?'Modifier':'Ajouter un créneau';
-  document.getElementById('sName').value=s?.name||'';
-  document.getElementById('sStart').value=s?.start||'08:00';
-  document.getElementById('sEnd').value=s?.end||'12:00';
-  openModal('modalSlot');
-}
-
-async function saveSlot(){
-  const name=document.getElementById('sName').value.trim(),start=document.getElementById('sStart').value,end=document.getElementById('sEnd').value;
+// SLOT
+let eSid=null;
+$('btnAddSlot').addEventListener('click',()=>openSlotModal(null));
+function openSlotModal(id){ eSid=id; const s=id?S.slots.find(x=>x.id===id):null; $('slotModalTitle').textContent=id?'Modifier':'Ajouter un créneau'; $('sName').value=s?.name||''; $('sStart').value=s?.start||'08:00'; $('sEnd').value=s?.end||'12:00'; openM('modalSlot'); }
+$('btnSaveSlot').addEventListener('click',async()=>{
+  const name=val('sName').trim(),start=val('sStart'),end=val('sEnd');
   if(!name){toast('Nom requis','error');return;}
-  if(editingSlotId){
-    const s=STATE.slots.find(x=>x.id===editingSlotId);
-    await fbSet('slots',editingSlotId,{...s,name,start,end});
-  } else {
-    const id=uid();
-    await fbSet('slots',id,{id,name,start,end});
-  }
-  closeModal('modalSlot');
-  toast('Créneau enregistré','success');
-}
+  if(eSid){ const s=S.slots.find(x=>x.id===eSid); await fSet('slots',eSid,{...s,name,start,end}); }
+  else{ const id=uid(); await fSet('slots',id,{id,name,start,end}); }
+  closeM('modalSlot'); toast('Créneau enregistré','success');
+});
+async function delSlot(id){ if(!confirm('Supprimer ?')) return; await fDel('slots',id); toast('Supprimé','success'); }
 
-async function deleteSlot(id){
-  if(!confirm('Supprimer ce créneau ?')) return;
-  await fbDel('slots',id);
-  toast('Créneau supprimé','success');
-}
+// ── EXPORT / RESET ───────────────────────────────────────────────
+function exportJSON(){ const b=new Blob([JSON.stringify(S,null,2)],{type:'application/json'}); const a=document.createElement('a'); a.href=URL.createObjectURL(b); a.download=`teamplanner_${fmt(new Date())}.json`; a.click(); toast('Export JSON téléchargé','success'); }
 
-// ═══════════════════════════════════════════════════════════
-//  EXPORT
-// ═══════════════════════════════════════════════════════════
-function exportJSON(){
-  const blob=new Blob([JSON.stringify(STATE,null,2)],{type:'application/json'});
-  const a=document.createElement('a');
-  a.href=URL.createObjectURL(blob);
-  a.download=`teamplanner_${fmt(new Date())}.json`;
-  a.click();
-  toast('Export JSON téléchargé','success');
-}
-
-function exportPDF(){ window.print(); }
-
-async function resetAll(){
+$('btnReset').addEventListener('click',async()=>{
   if(!confirm('Réinitialiser TOUTES les données Firestore ?')) return;
   if(!confirm('Irréversible. Continuer ?')) return;
-  const cols=['posts','slots','assignments','leaves','requests'];
-  for(const c of cols){
-    const snap=await window._fb.getDocs(col(c));
-    for(const d of snap.docs) await fbDel(c,d.id);
-  }
+  for(const name of ['posts','slots','assignments','leaves','requests']){ const snap=await getDocs(cRef(name)); for(const d of snap.docs) await fDel(name,d.id); }
   toast('Données réinitialisées','success');
-}
+});
 </script>
-
-<style>
-@media print {
-  body{background:white!important;color:black!important;font-size:11px}
-  #loadingScreen,#loginScreen,.topbar,.cal-toolbar,.page-header .actions,#conflictBanner{display:none!important}
-  .page{display:block!important;padding:0!important}
-  .week-grid,.month-grid{border:1px solid #ccc!important}
-  .wh-day,.ws-label,.ws-cell,.wh-corner,.month-cell,.month-day-header{background:white!important;color:black!important;border-color:#ccc!important}
-  .assign-chip{background:#eee!important;color:black!important;border:1px solid #ccc!important}
-  .assign-chip.conflict{border:2px solid red!important}
-}
-</style>
 </body>
 </html>
